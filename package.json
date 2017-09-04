@@ -1,0 +1,26 @@
+{
+  "name": "fabric-editor",
+  "version": "1.0.0",
+  "description": "fabric-editor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhengsk/fabric-editor.git"
+  },
+  "keywords": [
+    "fabric",
+    "editor"
+  ],
+  "author": "zark",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhengsk/fabric-editor/issues"
+  },
+  "homepage": "https://github.com/zhengsk/fabric-editor#readme",
+  "dependencies": {
+    "fabric": "^2.0.0-beta.6"
+  }
+}
