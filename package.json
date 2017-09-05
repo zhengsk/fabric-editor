@@ -21,6 +21,10 @@
   },
   "homepage": "https://github.com/zhengsk/fabric-editor#readme",
   "dependencies": {
-    "fabric": "^2.0.0-beta.6"
+    "fabric": "^2.0.0-beta.6",
+    "vue": "^2.4.2"
+  },
+  "devDependencies": {
+    "webpack": "^3.5.5"
   }
 }
