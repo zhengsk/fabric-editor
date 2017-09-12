@@ -18,20 +18,36 @@ module.exports = {
     },
 
     module: {
+        exprContextCritical: false,
+
         rules: [{
-            test: /\.css$/,
-            use: ExtractTextPlugin.extract({
-                fallback: "style-loader",
-                use: "css-loader",
-            })
+            test: /\.js$/,
+            exclude: /(node_modules)/,
+            use: {
+                loader: 'babel-loader',
+                options: {
+                    presets: ['env'],
+                    plugins: ['transform-runtime'],
+                },
+            }
         }, {
             test: /\.(png|jpg|jpeg|gif|svg)$/,
             use: [{
                 loader: 'file-loader',
                 options: {
-                    outputPath: './assets/'
+                    outputPath: './assets/',
                 }
             }]
+        }, {
+            test: /\.(s)?css$/,
+            use: ExtractTextPlugin.extract({
+                fallback: "style-loader",
+                use: [{
+                    loader: "css-loader",
+                }, {
+                    loader: "sass-loader",
+                }],
+            })
         }]
     },
 
@@ -39,7 +55,7 @@ module.exports = {
         new CleanWebpackPlugin(['dist']),
 
         new ExtractTextPlugin({
-            filename: 'style.[contenthash].css'
+            filename: './style/[name].[contenthash].css'
         }),
 
         new HtmlWebpackPlugin({

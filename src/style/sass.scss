@@ -1,0 +1,13 @@
+body {
+    canvas {
+        width: 200px;
+        height: 200px;
+        border: 1px solid #F00;
+    }
+    &::before {
+        content: 'BEFORE';
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+}

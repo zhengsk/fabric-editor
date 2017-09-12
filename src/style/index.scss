@@ -1,0 +1,19 @@
+html,
+body {
+    background-color: #CCC;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    .canvas-container {
+        margin: auto;
+        #editor {
+            display: block;
+            margin: auto;
+            width: 500px;
+            height: 500px;
+            background-color: #EEE;
+        }
+    }
+}
