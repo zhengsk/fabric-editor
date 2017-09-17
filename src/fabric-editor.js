@@ -1,11 +1,13 @@
 import Promise from 'bluebird';
 import { fabric } from 'fabric';
 import Vue from 'vue';
+import fabricHistory from './componets/fabric-history.js';
 
 
 const fabricEditor = {
     name: 'fabric-editor',
     template: '<canvas></canvas>',
+    mixins: [fabricHistory],
     props: {
         width: Number,
         height: Number,
@@ -29,14 +31,14 @@ const fabricEditor = {
          * renderAll 重新渲染画布 fabric.renderAll 方法
          */
         renderAll() {
-            this.editor.renderAll();
+            this.fabric.renderAll();
         },
 
         /**
          * context 画布上小文
          */
         context() {
-            return this.editor.canvas.getContext('2d');
+            return this.fabric.canvas.getContext('2d');
         },
 
         getImageFromeURL(url, options) {
@@ -53,7 +55,7 @@ const fabricEditor = {
         setPlate(imgSrc, options) {
             return this.getImageFromeURL(imgSrc, options).then(image => {
                 this.context.globalCompositeOperation = "source-out";
-                this.editor.setBackgroundImage(image);
+                this.fabric.setBackgroundImage(image);
                 this.renderAll();
                 return image;
             });
@@ -74,7 +76,7 @@ const fabricEditor = {
                     left: 0,
                     opacity: 1
                 });
-                this.editor.add(image);
+                this.fabric.add(image);
                 this.setElementCenter(image);
 
                 if (select) {
@@ -98,7 +100,7 @@ const fabricEditor = {
             }, options);
 
             var textElement = new fabric.Textbox(text, opts);
-            this.editor.add(textElement);
+            this.fabric.add(textElement);
 
             this.setElementCenter(textElement);
 
@@ -127,7 +129,7 @@ const fabricEditor = {
         forwardElement(element) {
             element = element || this.getElement();
             if (element) {
-                this.editor.bringForward(element);
+                this.fabric.bringForward(element);
             }
             return element;
         },
@@ -139,7 +141,7 @@ const fabricEditor = {
         frontElment(element) {
             element = element || this.getElement();
             if (element) {
-                this.editor.bringToFront(element);
+                this.fabric.bringToFront(element);
             }
             return element;
         },
@@ -151,7 +153,7 @@ const fabricEditor = {
         backwardElement(element) {
             element = element || this.getElement();
             if (element) {
-                this.editor.sendBackwards(element);
+                this.fabric.sendBackwards(element);
             }
             return element;
         },
@@ -163,7 +165,7 @@ const fabricEditor = {
         backElement(element) {
             element = element || this.getElement();
             if (element) {
-                this.editor.sendToBack(element);
+                this.fabric.sendToBack(element);
             }
             return element;
         },
@@ -174,7 +176,7 @@ const fabricEditor = {
          * @param {Event} event - 事件对象
          */
         setCurrentElement(element, event) {
-            this.editor.setActiveObject(element, event);
+            this.fabric.setActiveObject(element, event);
             return element;
         },
 
@@ -183,7 +185,7 @@ const fabricEditor = {
          * @param {Boolean} [isAll = false] - 是否返回所有
          */
         getCurrentElement(isAll = false) {
-            return this.editor[isAll ? 'getActiveObjects' : 'getActiveObject']();
+            return this.fabric[isAll ? 'getActiveObjects' : 'getActiveObject']();
         },
 
         /**
@@ -207,7 +209,7 @@ const fabricEditor = {
          * @param {Object} element
          */
         setActiveElement(element) {
-            this.editor.setActiveObject(element);
+            this.fabric.setActiveObject(element);
             return element
         },
 
@@ -216,7 +218,7 @@ const fabricEditor = {
          * @param {Object} e
          */
         deactiveElement(e) {
-            this.editor.discardActiveObject(e);
+            this.fabric.discardActiveObject(e);
         },
 
 
@@ -233,7 +235,7 @@ const fabricEditor = {
          * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
          */
         exportDataURL(options) {
-            return this.editor.toDataURL(options);
+            return this.fabric.toDataURL(options);
         },
 
         /**
@@ -243,7 +245,7 @@ const fabricEditor = {
          */
         importTemplate(data, reviver) {
             return new Promise((resolve, reject) => {
-                this.editor.loadFromJSON(data, resolve, reviver);
+                this.fabric.loadFromJSON(data, resolve, reviver);
             });
         },
 
@@ -251,12 +253,16 @@ const fabricEditor = {
          * exportTemplate 导出模板数据
          */
         exportTemplate() {
-            return this.editor.toJSON();
-        }
+            return this.fabric.toJSON();
+        },
+
+        exportTemplateString() {
+            return JSON.stringify(this.exportTemplate());
+        },
     },
 
     mounted() {
-        this.editor = new fabric.Canvas(this.$el, {
+        this.fabric = new fabric.Canvas(this.$el, {
             width: this.width,
             height: this.height,
             controlsAboveOverlay: true,
@@ -277,6 +283,7 @@ const fabricEditor = {
             cornerStrokeColor: '#ffffff',
             cornerStyle: 'circle',
         });
+
     }
 }
 Vue.component('fabric-editor', fabricEditor);
