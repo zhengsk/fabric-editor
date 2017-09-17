@@ -5,15 +5,34 @@ body {
     background-position: center;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    .canvas-container {
-        margin: auto;
-        #editor {
-            display: block;
+    overflow: hidden;
+    #app {
+        position: absolute;
+        border: 10px solid #CCC;
+        top: 0;
+        left: 0;
+        right: 240px;
+        bottom: 0;
+        overflow: auto;
+        box-sizing: border-box;
+        .canvas-container {
             margin: auto;
-            width: 500px;
-            height: 500px;
-            background-color: #EEE;
+            border: 1px solid #F00;
+        }
+    }
+    .side-bar {
+        position: fixed;
+        background-color: #FFF;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 200px;
+        padding: 20px;
+        button {
+            display: inline-block;
+            width: 80px;
+            padding: 10px;
+            margin: 5px;
         }
     }
 }
