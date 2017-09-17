@@ -4,7 +4,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
-    entry: './src/app.js',
+    entry: './src/index.js',
 
     output: {
         filename: 'bundle.js',
@@ -15,6 +15,12 @@ module.exports = {
 
     devServer: {
         contentBase: './dist'
+    },
+
+    resolve: {
+        alias: {
+            vue: 'vue/dist/vue.js'
+        }
     },
 
     module: {
