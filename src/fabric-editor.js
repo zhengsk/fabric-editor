@@ -121,6 +121,54 @@ const fabricEditor = {
         },
 
         /**
+         * 向前一步层级
+         * @param {Object} element
+         */
+        forwardElement(element) {
+            element = element || this.getElement();
+            if (element) {
+                this.editor.bringForward(element);
+            }
+            return element;
+        },
+
+        /**
+         * 置顶层级
+         * @param {Object} element
+         */
+        frontElment(element) {
+            element = element || this.getElement();
+            if (element) {
+                this.editor.bringToFront(element);
+            }
+            return element;
+        },
+
+        /**
+         * 向后一步层级
+         * @param {Object} element
+         */
+        backwardElement(element) {
+            element = element || this.getElement();
+            if (element) {
+                this.editor.sendBackwards(element);
+            }
+            return element;
+        },
+
+        /**
+         * 置底层级
+         * @param {Object} element
+         */
+        backElement(element) {
+            element = element || this.getElement();
+            if (element) {
+                this.editor.sendToBack(element);
+            }
+            return element;
+        },
+
+        /**
          * 设置当前元素
          * @param {Object} element - 要设置的元素
          * @param {Event} event - 事件对象
@@ -147,6 +195,14 @@ const fabricEditor = {
         },
 
         /**
+         * 获取元素
+         * @param {Object} [element]
+         */
+        getElement(element) {
+            return element || this.getCurrentElement();
+        },
+
+        /**
          * 设置选中元素
          * @param {Object} element
          */
@@ -162,6 +218,7 @@ const fabricEditor = {
         unActiveElement(e) {
             this.editor.discardActiveObject(e);
         },
+
 
         /**
          * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
@@ -203,15 +260,19 @@ const fabricEditor = {
             width: this.width,
             height: this.height,
             controlsAboveOverlay: true,
+            preserveObjectStacking: true,
             borderColor: 'red',
             borderScaleFactor: 90,
-            preserveObjectStacking: true,
         });
 
         // Object default value.
         fabric.Object.prototype.set({
             transparentCorners: false,
-            borderColor: '#ff00ff',
+            borderDashArray: [3, 3],
+            borderColor: '#ff0000',
+            borderScaleFactor: 1,
+
+            cornerSize: 15,
             cornerColor: '#ff0000',
             cornerStrokeColor: '#ffffff',
             cornerStyle: 'circle',
