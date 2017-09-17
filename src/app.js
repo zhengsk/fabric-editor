@@ -22,72 +22,47 @@ fabric.Object.prototype.set({
 
 
 
-import img from './assets/images/pattern.jpg';
-import shoes from './assets/images/mask-shose.png';
-import shoesInvert from './assets/images/mask-shose-invert.png';
+import shoes from './assets/images/shoes.png';
+import shoesMask from './assets/images/shoes-mask.png';
+import pattern from './assets/images/xx.png';
 
 // Add shose
 fabric.Image.fromURL(shoes, function(oImg) {
     // canvas.globalCompositeOperation = "source-out";
     canvas.setBackgroundImage(oImg);
 
-
-    // canvas.add(oImg);
-    // oImg.viewportCenter();
-
-    // Add Rect
-    var rect = new fabric.Rect({
-        globalCompositeOperation: 'source-atop',
-        left: 0,
-        top: 0,
-        fill: 'red',
-        width: 800,
-        height: 800
-    });
-    canvas.centerObject(rect);
-    canvas.add(rect);
-
-    // Add pattern
-    fabric.Image.fromURL(img, function(oImg) {
-        oImg.set({
-            globalCompositeOperation: 'source-atop',
-            scaleX: 1 / 2,
-            scaleY: 1 / 2,
-            top: 250 / 2,
-            left: 250 / 2,
+    // Add mask
+    fabric.Image.fromURL(shoesMask, function(mask) {
+        mask.set({
+            // globalCompositeOperation: 'difference',
+            scaleX: 1,
+            scaleY: 1,
+            top: 0,
+            left: 0,
+            opacity: 1
         });
-        canvas.add(oImg);
-        oImg.viewportCenter();
 
-        fabric.Image.fromURL(img, function(oImg) {
-            oImg.set({
-                globalCompositeOperation: 'source-atop',
-                scaleX: 1 / 2,
-                scaleY: 1 / 2,
-                top: 50 / 2,
-                left: 250 / 2,
-            });
-            canvas.add(oImg);
-            // oImg.viewportCenter();
-        });
-    });
+        window.mask = mask;
 
-    // Add text
-    var text = new fabric.Text('Honey,\nI\'m subtle', {
-        globalCompositeOperation: 'source-atop',
-        fill: '#0000FF',
-        fontSize: 250,
-        left: 0,
-        top: 0,
-        lineHeight: 1,
-        originX: 'left',
-        fontFamily: 'Helvetica',
-        fontWeight: 'bold',
-        statefullCache: true,
-        scaleX: 0.4,
-        scaleY: 0.4
+        // // Add pattern
+        // fabric.Image.fromURL(pattern, function(oImg) {
+        //     var filter = new fabric.Image.filters.BlendImage({
+        //         image: oImg,
+        //         mode: 'multiply',
+        //         alpha: 1
+        //     });
+        //     mask.filters.push(filter);
+        //     mask.applyFilters();
+
+        canvas.add(mask);
+        //     mask.viewportCenter();
+
+        //     canvas.renderAll();
+        // });
+        // window.mask = mask;
+
+        canvas.renderAll();
     });
-    canvas.add(text);
 });
 
 
