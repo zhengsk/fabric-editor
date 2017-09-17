@@ -94,7 +94,7 @@ const fabricEditor = {
             const opts = Object.assign({
                 globalCompositeOperation: "source-atop",
                 width: 380,
-
+                textAlign: 'center',
             }, options);
 
             var textElement = new fabric.Textbox(text, opts);
@@ -215,7 +215,7 @@ const fabricEditor = {
          * 取消选中元素
          * @param {Object} e
          */
-        unActiveElement(e) {
+        deactiveElement(e) {
             this.editor.discardActiveObject(e);
         },
 
