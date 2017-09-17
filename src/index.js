@@ -26,7 +26,12 @@ window.onload = () => {
             console.info('App mouted');
             // debugger;
             this.editor.setPlate(plate);
-            this.editor.addImage(pattern);
+            this.editor.addImage(pattern, {
+                width: 500,
+                height: 500
+            });
         },
     });
+
+    window.editor = editor.editor;
 }
