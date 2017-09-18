@@ -4,6 +4,7 @@
 function History(options) {
     this.queue = [];
     this.current = -1;
+    this.enable = true;
     this.maxLength = options.length || 80;
     this.disable = false;
     this.throttle = options.throttle || 300; // ms

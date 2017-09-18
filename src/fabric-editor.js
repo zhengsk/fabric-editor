@@ -244,8 +244,11 @@ const fabricEditor = {
          * @param {Function} reviver - Method for further parsing of JSON elements, called after each fabric object created.
          */
         importTemplate(data, reviver) {
+            this.history.enable = false;
             return new Promise((resolve, reject) => {
                 this.fabric.loadFromJSON(data, resolve, reviver);
+            }).finally(() => {
+                this.history.enable = true;
             });
         },
 
