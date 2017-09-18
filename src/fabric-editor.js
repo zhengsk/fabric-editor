@@ -2,12 +2,13 @@ import Promise from 'bluebird';
 import { fabric } from 'fabric';
 import Vue from 'vue';
 import fabricHistory from './componets/fabric-history.js';
+import fabricText from './componets/fabric-text.js';
 
 
 const fabricEditor = {
     name: 'fabric-editor',
     template: '<canvas></canvas>',
-    mixins: [fabricHistory],
+    mixins: [fabricText, fabricHistory],
     props: {
         width: Number,
         height: Number,
@@ -57,6 +58,8 @@ const fabricEditor = {
                 this.context.globalCompositeOperation = "source-out";
                 this.fabric.setBackgroundImage(image);
                 this.renderAll();
+
+                this.history.add('setPlate');
                 return image;
             });
         },
@@ -82,32 +85,10 @@ const fabricEditor = {
                 if (select) {
                     this.setActiveElement(image);
                 }
+
+                this.makeSnapshot('addImage');
                 return image;
             });
-        },
-
-        /**
-         * addText 添加文本元素
-         * @param {String} text - 文字内容
-         * @param {Object} options - 元素参数配置
-         */
-        addText(text, options = {}, select = true) {
-            text = text || 'Double click to editor.';
-            const opts = Object.assign({
-                globalCompositeOperation: "source-atop",
-                width: 380,
-                textAlign: 'center',
-            }, options);
-
-            var textElement = new fabric.Textbox(text, opts);
-            this.fabric.add(textElement);
-
-            this.setElementCenter(textElement);
-
-            if (select) {
-                this.setActiveElement(textElement);
-            }
-            return textElement;
         },
 
         /**
@@ -119,6 +100,7 @@ const fabricEditor = {
             if (ele) {
                 ele.center();
                 ele.setCoords();
+                this.makeSnapshot('set Element Center');
             }
         },
 
@@ -177,6 +159,7 @@ const fabricEditor = {
          */
         setCurrentElement(element, event) {
             this.fabric.setActiveObject(element, event);
+            this.renderAll();
             return element;
         },
 
@@ -193,7 +176,7 @@ const fabricEditor = {
          * @param {*} [elementType] - 元素类型
          */
         getAllElements(elementType) {
-            return this.getObjects(elementType);
+            return this.fabric.getObjects(elementType);
         },
 
         /**
@@ -210,6 +193,7 @@ const fabricEditor = {
          */
         setActiveElement(element) {
             this.fabric.setActiveObject(element);
+            this.renderAll();
             return element
         },
 
@@ -219,6 +203,33 @@ const fabricEditor = {
          */
         deactiveElement(e) {
             this.fabric.discardActiveObject(e);
+        },
+
+        /**
+         * 获取元素索引值
+         * @param {Object} [element]
+         * @returns {Number} - 索引值
+         */
+        getIndexFromElement(element) {
+            element = this.getElement(element);
+            if (element) {
+                const elements = this.getAllElements();
+                for (let i = 0, j = elements.length; i < j; i++) {
+                    if (element === elements[i]) {
+                        return i;
+                    }
+                }
+            }
+            return null;
+        },
+
+        /**
+         * 通过索引得到元素
+         * @param {Number} index - 索引
+         * @returns {Object} - element
+         */
+        getElementFromIndex(index) {
+            return this.fabric.item(index);
         },
 
 
@@ -239,16 +250,16 @@ const fabricEditor = {
         },
 
         /**
-         * importTemplate 导入模板数据
+         * 导入模板数据
          * @param {JSON} data - 模板数据
          * @param {Function} reviver - Method for further parsing of JSON elements, called after each fabric object created.
          */
         importTemplate(data, reviver) {
-            this.history.enable = false;
+            this.toggleSnapshot(false);
             return new Promise((resolve, reject) => {
                 this.fabric.loadFromJSON(data, resolve, reviver);
             }).finally(() => {
-                this.history.enable = true;
+                this.toggleSnapshot(true);
             });
         },
 

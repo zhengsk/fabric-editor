@@ -6,7 +6,6 @@ function History(options) {
     this.current = -1;
     this.enable = true;
     this.maxLength = options.length || 80;
-    this.disable = false;
     this.throttle = options.throttle || 300; // ms
 }
 
@@ -23,15 +22,17 @@ History.prototype.init = function() {
 // }
 
 History.prototype.add = function(item) {
-    if (this.disable) {
+    if (!this.enable) { // Disable.
+        return false;
+    }
+
+    if (item.data === this.queue[this.current.data]) { // Same history data as previous.
         return false;
     }
 
     clearTimeout(this.timer);
 
     const action = () => {
-        console.log("=== History.set");
-
         if (this.current !== this.queue.length - 1) {
             this.queue.splice(this.current, this.queue.length - this.current);
         }
@@ -44,10 +45,7 @@ History.prototype.add = function(item) {
         this.queue.push(item);
         this.current++;
 
-        console.log("==> INFO : ");
-        console.log(this.queue.length);
-        console.log("===========");
-        console.log("current: ", 0 + this.current);
+        console.log('History set:', 0 + this.current, ' / ', this.queue.length);
 
         return item;
     };
@@ -56,30 +54,18 @@ History.prototype.add = function(item) {
 };
 
 History.prototype.prev = function() {
-
-    console.log("=== History.prev");
-
     this.current = Math.max(0, this.current - 1);
     const item = this.queue[this.current];
 
-    console.log("==> INFO : ");
-    console.log(item);
-    console.log("===========");
-    console.log("current: ", 0 + this.current);
+    console.log('History prev:', 0 + this.current, '/', this.queue.length);
     return item;
 };
 
 History.prototype.next = function() {
-
-    console.log("=== History.next");
-
-    this.current = Math.min(this.current + 1, this.queue.length);
+    this.current = Math.min(this.current + 1, this.queue.length - 1);
     const item = this.queue[this.current];
 
-    console.log("==> INFO : ");
-    console.log(item);
-    console.log("===========");
-    console.log("current: ", 0 + this.current);
+    console.log('History next:', 0 + this.current, '/', this.queue.length);
     return item;
 };
 
