@@ -1,14 +1,16 @@
 import Promise from 'bluebird';
 import { fabric } from 'fabric';
 import Vue from 'vue';
+
 import fabricHistory from './componets/fabric-history.js';
+import fabricImage from './componets/fabric-image.js';
 import fabricText from './componets/fabric-text.js';
 
 
 const fabricEditor = {
     name: 'fabric-editor',
     template: '<canvas></canvas>',
-    mixins: [fabricText, fabricHistory],
+    mixins: [fabricImage, fabricText, fabricHistory],
     props: {
         width: Number,
         height: Number,
@@ -65,33 +67,6 @@ const fabricEditor = {
         },
 
         /**
-         * addImage 添加图片
-         * @param {String} imgSrc  - 图片地址
-         * @param {Object} options - fabric image 参数
-         */
-        addImage(imgSrc, options = {}, select = true) {
-            return this.getImageFromeURL(imgSrc, options).then(image => {
-                image.set({
-                    globalCompositeOperation: 'source-atop',
-                    scaleX: 1,
-                    scaleY: 1,
-                    top: 0,
-                    left: 0,
-                    opacity: 1
-                });
-                this.fabric.add(image);
-                this.setElementCenter(image);
-
-                if (select) {
-                    this.setActiveElement(image);
-                }
-
-                this.makeSnapshot('addImage');
-                return image;
-            });
-        },
-
-        /**
          * 设置元素画布居中
          * @param {*} element
          */
@@ -109,7 +84,7 @@ const fabricEditor = {
          * @param {Object} element
          */
         forwardElement(element) {
-            element = element || this.getElement();
+            element = this.getElement();
             if (element) {
                 this.fabric.bringForward(element);
             }
@@ -121,7 +96,7 @@ const fabricEditor = {
          * @param {Object} element
          */
         frontElment(element) {
-            element = element || this.getElement();
+            element = this.getElement();
             if (element) {
                 this.fabric.bringToFront(element);
             }
@@ -133,7 +108,7 @@ const fabricEditor = {
          * @param {Object} element
          */
         backwardElement(element) {
-            element = element || this.getElement();
+            element = this.getElement();
             if (element) {
                 this.fabric.sendBackwards(element);
             }
@@ -145,7 +120,7 @@ const fabricEditor = {
          * @param {Object} element
          */
         backElement(element) {
-            element = element || this.getElement();
+            element = this.getElement();
             if (element) {
                 this.fabric.sendToBack(element);
             }

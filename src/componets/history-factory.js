@@ -9,12 +9,6 @@ function History(options) {
     this.throttle = options.throttle || 300; // ms
 }
 
-History.prototype.init = function() {
-    this.queue = [];
-    this.current = -1;
-    this.add();
-};
-
 // item = {
 //     action: 'change',
 //     currentElement: 'element',
@@ -70,7 +64,8 @@ History.prototype.next = function() {
 };
 
 History.prototype.clear = function() {
-    this.init();
+    this.queue = [];
+    this.current = -1;
 };
 
 export default History;

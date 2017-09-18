@@ -50,6 +50,14 @@ export default {
             } else {
                 this.history.enable = enable;
             }
+        },
+
+        /**
+         * 重置历史快照
+         */
+        resetSnapshot() {
+            this.history.clear();
+            this.makeSnapshot();
         }
     },
 
