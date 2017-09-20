@@ -1,24 +1,22 @@
 {
     "version": 1,
-    "template": "{json data}",
-    "plate": [{
-
+    "plates": [{
+        "plate": "plate url", // 鞋面图片
+        "template": "{json data}", // editor image
+        "url": "resultImageUrl"
     }],
 
     "rendering": [{
         "picture": "picture url", // 鞋子照片
         "mask": [{
-            "url": "mask url",
             "plate": 3,
+            "url": "mask url",
             "position": [
                 [33, 44],
-                [33, 44],
-                [33, 44],
-                [33, 44]
-            ],
-            "filter": {
-
-            }
+                [500, 94],
+                [33, 800],
+                [799, 600]
+            ]
         }]
     }]
 }
