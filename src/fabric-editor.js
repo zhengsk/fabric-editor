@@ -181,6 +181,19 @@ const fabricEditor = {
         },
 
         /**
+         * 删除元素
+         * @param {Object} [element] - 要删除的元素
+         */
+        deleteElement(element) {
+            element = this.getElement();
+            if (element) {
+                this.fabric.remove(element);
+                this.makeSnapshot('Remove element');
+                return element;
+            }
+        },
+
+        /**
          * 获取元素索引值
          * @param {Object} [element]
          * @returns {Number} - 索引值
