@@ -11,7 +11,7 @@
         "mask": [{
             "plate": 3,
             "url": "mask url",
-            "position": [
+            "points": [
                 [33, 44],
                 [500, 94],
                 [33, 800],
