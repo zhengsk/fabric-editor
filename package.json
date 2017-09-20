@@ -1,48 +1,48 @@
 {
-  "name": "fabric-editor",
-  "version": "1.0.0",
-  "description": "fabric-editor",
-  "main": "index.js",
-  "scripts": {
-    "build": "webpack",
-    "dev": "webpack-dev-server --open"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zhengsk/fabric-editor.git"
-  },
-  "keywords": [
-    "fabric",
-    "editor"
-  ],
-  "author": "zark",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/zhengsk/fabric-editor/issues"
-  },
-  "homepage": "https://github.com/zhengsk/fabric-editor#readme",
-  "dependencies": {
-    "bluebird": "^3.5.0",
-    "fabric": "^2.0.0-beta.6",
-    "transform-image": "^1.0.0",
-    "vue": "^2.4.2"
-  },
-  "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.0",
-    "clean-webpack-plugin": "^0.1.16",
-    "css-loader": "^0.28.7",
-    "extract-text-webpack-plugin": "^3.0.0",
-    "file-loader": "^0.11.2",
-    "html-webpack-plugin": "^2.30.1",
-    "node-sass": "^4.5.3",
-    "postcss-loader": "^2.0.6",
-    "sass-lint": "^1.11.1",
-    "sass-loader": "^6.0.6",
-    "style-loader": "^0.18.2",
-    "webpack": "^3.5.5",
-    "webpack-dev-server": "^2.7.1"
-  }
+    "name": "fabric-editor",
+    "version": "1.0.0",
+    "description": "fabric-editor",
+    "main": "dist/main.js",
+    "scripts": {
+        "build": "webpack",
+        "dev": "webpack-dev-server --open"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/zhengsk/fabric-editor.git"
+    },
+    "keywords": [
+        "fabric",
+        "editor"
+    ],
+    "author": "zark",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/zhengsk/fabric-editor/issues"
+    },
+    "homepage": "https://github.com/zhengsk/fabric-editor#readme",
+    "dependencies": {
+        "bluebird": "^3.5.0",
+        "fabric": "^2.0.0-beta.6",
+        "transform-image": "^1.0.0",
+        "vue": "^2.4.2"
+    },
+    "devDependencies": {
+        "babel-core": "^6.26.0",
+        "babel-loader": "^7.1.2",
+        "babel-plugin-transform-runtime": "^6.23.0",
+        "babel-preset-env": "^1.6.0",
+        "clean-webpack-plugin": "^0.1.16",
+        "css-loader": "^0.28.7",
+        "extract-text-webpack-plugin": "^3.0.0",
+        "file-loader": "^0.11.2",
+        "html-webpack-plugin": "^2.30.1",
+        "node-sass": "^4.5.3",
+        "postcss-loader": "^2.0.6",
+        "sass-lint": "^1.11.1",
+        "sass-loader": "^6.0.6",
+        "style-loader": "^0.18.2",
+        "webpack": "^3.5.5",
+        "webpack-dev-server": "^2.7.1"
+    }
 }
