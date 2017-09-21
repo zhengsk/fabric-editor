@@ -46,7 +46,7 @@ const fabricEditor = {
 
         getImageFromeURL(url, options) {
             return new Promise((resolve, reject) => {
-                fabric.Image.fromURL(url, resolve, options);
+                fabric.Image.fromURL(url, resolve, {...options, crossOrigin: 'Anonymous' });
             });
         },
 

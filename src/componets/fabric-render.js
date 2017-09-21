@@ -48,6 +48,7 @@ export default {
                     );
                 });
 
+                // render Shose @TODO
             });
         }
     },
