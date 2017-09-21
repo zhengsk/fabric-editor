@@ -1,4 +1,4 @@
-import transformImage from 'transform-image';
+import transformImage from '../utils/transform-image';
 
 export default {
     name: 'fabric-render',
@@ -7,21 +7,21 @@ export default {
         return {
             "version": 1,
             "plates": [{
-                "plate": "plate url", // 鞋面图片
+                "plate": require('../assets/images/shoes.png'), // 鞋面原图
                 "template": "{json data}", // editor image
-                "url": "resultImageUrl"
+                "url": require('../assets/images/xx.png'), // 定制后的鞋面图片
             }],
 
             "rendering": [{
-                "picture": "picture url", // 鞋子照片
+                "picture": require('../assets/images/shoes.png'), // 鞋子照片
                 "mask": [{
-                    "plate": 3,
-                    "url": "mask url",
+                    "plate": 0,
+                    "url": require('../assets/images/shoes-mask.png'),
                     "points": [
-                        { x: 33, y: 44 },
-                        { x: 500, y: 94 },
-                        { x: 33, y: 800 },
-                        { x: 799, y: 600 },
+                        { x: 272, y: 111 },
+                        { x: 940, y: -28 },
+                        { x: 963, y: 703 },
+                        { x: 306, y: 1114 },
                     ]
                 }]
             }],
@@ -31,21 +31,33 @@ export default {
     methods: {
         // 获取变形后的图片
         getTransformImage(imageSrc, maskSrc, points) {
-            return transformImage({
+            const xx = transformImage({
                 imageSrc: imageSrc,
                 maskSrc: maskSrc,
                 points: points, // 默认位置
             });
+            return xx;
         },
 
         renderShose() {
             this.rendering.forEach(shoes => {
-                const maskedImage = shoes.mask.forEach(mask => {
+                // shoes picture.
+                const picture = shoes.picture;
+                const maskedImage = shoes.mask.map(mask => {
                     return this.getTransformImage(
-                        this.plates[mask.plate],
+                        this.plates[mask.plate].url,
                         mask.url,
                         mask.points
                     );
+                });
+
+
+                maskedImage.forEach(transform => {
+                    document.body.appendChild(transform.canvas);
+
+                    const image = new Image();
+                    image.src = transform.canvas.toDataURL();
+                    document.body.appendChild(image);
                 });
 
                 // render Shose @TODO
@@ -54,7 +66,8 @@ export default {
     },
 
     mounted() {
-
+        this.renderShose();
+        console.info('fabric-render');
     }
 
 

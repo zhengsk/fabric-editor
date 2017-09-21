@@ -5,12 +5,13 @@ import Vue from 'vue';
 import fabricHistory from './componets/fabric-history.js';
 import fabricImage from './componets/fabric-image.js';
 import fabricText from './componets/fabric-text.js';
+import fabricRender from './componets/fabric-render.js';
 
 
 const fabricEditor = {
     name: 'fabric-editor',
     template: '<canvas></canvas>',
-    mixins: [fabricImage, fabricText, fabricHistory],
+    mixins: [fabricImage, fabricText, fabricHistory, fabricRender],
     props: {
         width: Number,
         height: Number,
@@ -44,9 +45,10 @@ const fabricEditor = {
             return this.fabric.canvas.getContext('2d');
         },
 
-        getImageFromeURL(url, options) {
+        getImageFromeURL(url, options = {}) {
+            options.crossOrigin = 'Anonymous';
             return new Promise((resolve, reject) => {
-                fabric.Image.fromURL(url, resolve, {...options, crossOrigin: 'Anonymous' });
+                fabric.Image.fromURL(url, resolve, options);
             });
         },
 
