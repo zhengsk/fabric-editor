@@ -1,6 +1,11 @@
 import HistoryFactory from './history-factory';
 
 export default {
+    props: {
+        historyChange: {
+            type: Function
+        }
+    },
     methods: {
         undo() {
             if (this.history.current > 0) {
@@ -58,6 +63,19 @@ export default {
         resetSnapshot() {
             this.history.clear();
             this.makeSnapshot();
+        },
+
+        /**
+         * 历史记录发生变化发生事件
+         */
+        onSnapshot(item) {
+            this.$emit('onSnapshot', item, this.history);
+
+            this.plates[0].url = this.exportDataURL();
+
+            this.renderAllShose().each(context => {
+                document.body.appendChild(context.canvas);
+            });
         }
     },
 
@@ -66,6 +84,7 @@ export default {
         this.history = new HistoryFactory({
             maxLength: 80,
             throttle: 600,
+            onChange: self.onSnapshot,
         });
 
         this.$nextTick(() => {

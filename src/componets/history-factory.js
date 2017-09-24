@@ -7,6 +7,7 @@ function History(options) {
     this.enable = true;
     this.maxLength = options.length || 80;
     this.throttle = options.throttle || 300; // ms
+    this.onChange = options.onChange;
 }
 
 // item = {
@@ -41,6 +42,7 @@ History.prototype.add = function(item) {
 
         console.log('History set:', 0 + this.current, ' / ', this.queue.length);
 
+        this.onChange(item);
         return item;
     };
 
