@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import loadImage from '../utils/loadImage';
 import transformImage from '../utils/transform-image';
 
@@ -14,18 +15,32 @@ export default {
             }],
 
             "rendering": [{
-                "picture": require('../assets/images/shoes.png'), // 鞋子照片
-                "mask": [{
-                    "plate": 0,
-                    "url": require('../assets/images/shoes-mask.png'),
-                    "points": [
-                        { x: 272, y: 111 },
-                        { x: 940, y: -28 },
-                        { x: 963, y: 703 },
-                        { x: 306, y: 1114 },
-                    ]
-                }]
-            }],
+                    "picture": require('../assets/images/shoes.png'), // 鞋子照片
+                    "mask": [{
+                        "plate": 0,
+                        "url": require('../assets/images/shoes-mask.png'),
+                        "points": [
+                            { x: 272, y: 111 },
+                            { x: 940, y: -28 },
+                            { x: 963, y: 703 },
+                            { x: 306, y: 1114 },
+                        ]
+                    }]
+                },
+                {
+                    "picture": require('../assets/images/shoes.png'), // 鞋子照片
+                    "mask": [{
+                        "plate": 0,
+                        "url": require('../assets/images/shoes-mask.png'),
+                        "points": [
+                            { x: 272, y: 111 },
+                            { x: 940, y: -28 },
+                            { x: 963, y: 703 },
+                            { x: 306, y: 1114 },
+                        ]
+                    }]
+                }
+            ],
         };
     },
 
@@ -48,7 +63,6 @@ export default {
 
         /**
          * 获取鞋子照片底图
-         *
          */
         getBaseCanvas(picture) {
             return loadImage(picture).then(img => {
@@ -62,35 +76,45 @@ export default {
             });
         },
 
-        renderShose() {
-            this.rendering.forEach(shoes => {
-
-                this.getBaseCanvas(shoes.picture).then(ctx => {
-                    const maskedImage = shoes.mask.map(mask => {
-                        return this.getTransformImage(
-                            this.plates[mask.plate].url,
-                            mask.url,
-                            mask.points
-                        );
-                    });
-
-                    maskedImage[0].promise.then(context => {
-                        return ctx.drawImage(context.canvas, 0, 0);
-                    });
-
-                    document.body.appendChild(ctx.canvas);
-                });
-
-                // const image = new Image();
-                // image.src = ctx.canvas.toDataURL();
-                // document.body.appendChild(image);
+        /**
+         * 渲染一张鞋子图片
+         * @param {Object} rendering - 数据
+         * @returns canvas.context 渲染完成图片上下文
+         */
+        renderShose(shoes) {
+            // Get transformImages
+            const maskedImages = Promise.mapSeries(shoes.mask, mask => {
+                return this.getTransformImage(
+                    this.plates[mask.plate].url,
+                    mask.url,
+                    mask.points
+                );
             });
 
+            return this.getBaseCanvas(shoes.picture).then(context => {
+                return Promise.mapSeries(maskedImages, maskedImage => {
+                    return maskedImage.promise;
+                }).mapSeries(ctx => {
+                    return context.drawImage(ctx.canvas, 0, 0);
+                }).then(() => {
+                    return context;
+                });
+            });
+
+
+        },
+
+        renderAllShose() {
+            return Promise.mapSeries(this.rendering, shoes => {
+                return this.renderShose(shoes);
+            });
         }
     },
 
     mounted() {
-        this.renderShose();
+        this.renderAllShose().each(context => {
+            document.body.appendChild(context.canvas);
+        });;
         console.info('fabric-render');
     }
 }
