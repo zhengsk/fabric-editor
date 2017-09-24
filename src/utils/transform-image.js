@@ -1,7 +1,14 @@
 // https://github.com/NodeSite/canvas-test/tree/master/src/Funny-demo/transform
 import matrix from './matrix';
+import Promise from 'bluebird';
 
 function transformImage(options) {
+    let resolve, reject;
+    const promise = new Promise((res, rej) => {
+        resolve = res;
+        reject = rej;
+    });
+
     var opts = {
         width: 1000,
         height: 1000,
@@ -68,7 +75,6 @@ function transformImage(options) {
         idots = rectsplit(opts.count, dotscopy[0], dotscopy[1], dotscopy[2], dotscopy[3]);
 
         if (opts.maskSrc) {
-
             mask.onload = function() {
                 render(opts.points);
             };
@@ -174,8 +180,12 @@ function transformImage(options) {
             var idot3 = idots[i + count + 2];
             var idot4 = idots[i + count + 1];
 
-            ctx.globalAlpha = 0.8;
-            // ctx.globalCompositeOperation = 'source-atop';
+            if (opts.isMask) {
+                ctx.globalCompositeOperation = 'source-atop';
+            } else {
+                ctx.globalAlpha = 0.8;
+            }
+
             if (dot2 && dot3 && i % (count + 1) < count) {
                 //绘制三角形的下半部分
                 renderImage(idot3, dot3, idot2, dot2, idot4, dot4);
@@ -183,8 +193,12 @@ function transformImage(options) {
                 //绘制三角形的上半部分
                 renderImage(idot1, dot1, idot2, dot2, idot4, dot4, true);
             }
-            // ctx.globalCompositeOperation = 'source-over';
-            ctx.globalAlpha = 1;
+
+            if (opts.isMask) {
+                ctx.globalCompositeOperation = 'source-over';
+            } else {
+                ctx.globalAlpha = 1;
+            }
 
             // 显示圆点
             if (opts.hasDot) {
@@ -195,6 +209,8 @@ function transformImage(options) {
             }
         });
         ctx.restore();
+
+        resolve(ctx);
     }
 
     /**
@@ -311,6 +327,7 @@ function transformImage(options) {
         getPoints,
         reRender: render,
         options: opts,
+        promise: promise
     };
 };
 

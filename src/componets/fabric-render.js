@@ -1,3 +1,4 @@
+import loadImage from '../utils/loadImage';
 import transformImage from '../utils/transform-image';
 
 export default {
@@ -31,37 +32,60 @@ export default {
     methods: {
         // 获取变形后的图片
         getTransformImage(imageSrc, maskSrc, points) {
-            const xx = transformImage({
+            return transformImage({
                 imageSrc: imageSrc,
                 maskSrc: maskSrc,
                 points: points, // 默认位置
+                extend: 2, // 扩展三角形，处理缝隙问题
+                hasDrag: false, // 开启拖拽∏
+                hasDot: false, // 显示点
+                hasRect: false, // 显示方格
+                hasPic: true, // 显示图片
+                count: 10, // 等分割数量,
+                isMask: true, // 是否应用蒙版
             });
-            return xx;
+        },
+
+        /**
+         * 获取鞋子照片底图
+         *
+         */
+        getBaseCanvas(picture) {
+            return loadImage(picture).then(img => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 1000;
+                canvas.height = 1000;
+                ctx.drawImage(img, 0, 0);
+
+                return ctx;
+            });
         },
 
         renderShose() {
             this.rendering.forEach(shoes => {
-                // shoes picture.
-                const picture = shoes.picture;
-                const maskedImage = shoes.mask.map(mask => {
-                    return this.getTransformImage(
-                        this.plates[mask.plate].url,
-                        mask.url,
-                        mask.points
-                    );
+
+                this.getBaseCanvas(shoes.picture).then(ctx => {
+                    const maskedImage = shoes.mask.map(mask => {
+                        return this.getTransformImage(
+                            this.plates[mask.plate].url,
+                            mask.url,
+                            mask.points
+                        );
+                    });
+
+                    maskedImage[0].promise.then(context => {
+                        return ctx.drawImage(context.canvas, 0, 0);
+                    });
+
+                    document.body.appendChild(ctx.canvas);
                 });
 
-
-                maskedImage.forEach(transform => {
-                    document.body.appendChild(transform.canvas);
-
-                    const image = new Image();
-                    image.src = transform.canvas.toDataURL();
-                    document.body.appendChild(image);
-                });
-
-                // render Shose @TODO
+                // const image = new Image();
+                // image.src = ctx.canvas.toDataURL();
+                // document.body.appendChild(image);
             });
+
         }
     },
 
@@ -69,6 +93,4 @@ export default {
         this.renderShose();
         console.info('fabric-render');
     }
-
-
 }
