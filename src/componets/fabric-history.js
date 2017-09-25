@@ -69,13 +69,8 @@ export default {
          * 历史记录发生变化发生事件
          */
         onSnapshot(item) {
-            this.$emit('onSnapshot', item, this.history);
-
             this.plates[0].url = this.exportDataURL();
-
-            this.renderAllShose().each(context => {
-                document.body.appendChild(context.canvas);
-            });
+            this.$emit('snapshot', item, this.history);
         }
     },
 

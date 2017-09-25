@@ -44,19 +44,19 @@ export default {
                         ]
                     }]
                 },
-                // {
-                //     "picture": require('../assets/images/shoes.png'), // 鞋子照片
-                //     "mask": [{
-                //         "plate": 0,
-                //         "url": require('../assets/images/shoes-mask-01.png'),
-                //         "points": [
-                //             { x: 272, y: 111 },
-                //             { x: 940, y: -28 },
-                //             { x: 963, y: 703 },
-                //             { x: 306, y: 1114 },
-                //         ]
-                //     }]
-                // },
+                {
+                    "picture": require('../assets/images/shoes-02.png'), // 鞋子照片
+                    "mask": [{
+                        "plate": 0,
+                        "url": require('../assets/images/shoes-02-mask.png'),
+                        "points": [
+                            { x: 131, y: -33 },
+                            { x: 1064, y: 104 },
+                            { x: 987, y: 902 },
+                            { x: 66, y: 1057 },
+                        ]
+                    }]
+                },
             ],
         };
     },
@@ -101,8 +101,9 @@ export default {
                 });
                 return ContextStore[hash];
             } else {
+                // 使用缓存图片
                 return ContextStore[hash].then(ctx => {
-                    ctx.clearRect(0, 0, 1000, 100);
+                    ctx.clearRect(0, 0, 1000, 1000);
                     return ctx;
                 }).then(ctx => {
                     return ImageStore[hash].then(img => {
@@ -137,8 +138,6 @@ export default {
                     return context;
                 });
             });
-
-
         },
         /**
          * 渲染所有图片

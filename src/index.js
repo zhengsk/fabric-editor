@@ -22,6 +22,18 @@ window.onload = () => {
             fabricEditor
         },
 
+        methods: {
+            onSnapShot(item) {
+                console.info(item);
+                this.editor.renderAllShose().each(context => {
+                    if (!context.appended) {
+                        document.body.appendChild(context.canvas);
+                        context.appended = true;
+                    }
+                });
+            },
+        },
+
         mounted() {
             console.info('App mouted');
             // debugger;

@@ -10,7 +10,7 @@
 
 <body>
     <div id="app">
-        <fabric-editor ref="editor" :width='1000' :height='1000'></fabric-editor>
+        <fabric-editor ref="editor" :width='1000' :height='1000' @snapshot='onSnapShot'></fabric-editor>
     </div>
     <div class="side-bar">
         <button onclick="importTemplate()">载入模板</button>
