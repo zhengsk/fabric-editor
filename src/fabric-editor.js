@@ -20,6 +20,7 @@ const fabricEditor = {
     data: () => {
         return {
             currentElement: null, // 当前选中元素
+            currentPlate: null, // 当前编辑面板索引
         };
     },
 
@@ -222,6 +223,12 @@ const fabricEditor = {
             return this.fabric.item(index);
         },
 
+        /**
+         * 清除画布
+         */
+        clear() {
+            this.fabric.clear();
+        },
 
         /**
          * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
@@ -265,6 +272,23 @@ const fabricEditor = {
         },
     },
 
+    watch: {
+        currentPlate(val, oldVal) {
+            // 保存模板数据
+            if (oldVal !== null) {
+                this.plates[oldVal].template = this.exportTemplate();
+            }
+
+            const plateDatas = this.plates[val];
+            if (plateDatas.template) { // 使用模板
+                this.importTemplate(plateDatas.template);
+            } else { // 初始编辑
+                this.clear();
+                this.setPlate(plateDatas.plate);
+            }
+        }
+    },
+
     mounted() {
         this.fabric = new fabric.Canvas(this.$el, {
             width: this.width,
@@ -288,6 +312,9 @@ const fabricEditor = {
             cornerStyle: 'circle',
         });
 
+        this.$on('snapshot', () => {
+            this.plates[this.currentPlate].url = this.exportDataURL();
+        });
     }
 }
 Vue.component('fabric-editor', fabricEditor);

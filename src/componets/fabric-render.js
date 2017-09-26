@@ -13,20 +13,20 @@ export default {
         return {
             "version": 1,
             "plates": [{
-                "plate": require('../assets/images/shoes.png'), // 鞋面原图
-                "template": "{json data}", // editor image
-                "url": require('../assets/images/xx.png'), // 定制后的鞋面图片
+                "plate": require('../assets/images/plate-01.png'), // 鞋面原图
+                "template": null, // editor image
+                "url": null, // 定制后的鞋面图片
             }, {
-                "plate": require('../assets/images/shoes.png'), // 鞋面原图
-                "template": "{json data}", // editor image
-                "url": require('../assets/images/yy.jpg'), // 定制后的鞋面图片
+                "plate": require('../assets/images/plate-02.png'), // 鞋面原图
+                "template": null, // editor image
+                "url": null, // 定制后的鞋面图片
             }],
 
             "rendering": [{
-                    "picture": require('../assets/images/shoes.png'), // 鞋子照片
+                    "picture": require('../assets/images/shoes-04/shoes.png'), // 鞋子照片
                     "mask": [{
                         "plate": 0,
-                        "url": require('../assets/images/shoes-mask-01.png'),
+                        "url": require('../assets/images/shoes-04/mask-01.png'),
                         "points": [
                             { x: 272, y: 111 },
                             { x: 940, y: -28 },
@@ -35,7 +35,7 @@ export default {
                         ]
                     }, {
                         "plate": 1,
-                        "url": require('../assets/images/shoes-mask-02.png'),
+                        "url": require('../assets/images/shoes-04/mask-07.png'),
                         "points": [
                             { x: 272, y: 111 },
                             { x: 940, y: -28 },
@@ -45,15 +45,28 @@ export default {
                     }]
                 },
                 {
-                    "picture": require('../assets/images/shoes-02.png'), // 鞋子照片
+                    "picture": require('../assets/images/shoes-02/shoes.png'), // 鞋子照片
                     "mask": [{
                         "plate": 0,
-                        "url": require('../assets/images/shoes-02-mask.png'),
+                        "url": require('../assets/images/shoes-02/mask-01.png'),
                         "points": [
                             { x: 131, y: -33 },
                             { x: 1064, y: 104 },
                             { x: 987, y: 902 },
                             { x: 66, y: 1057 },
+                        ]
+                    }]
+                },
+                {
+                    "picture": require('../assets/images/shoes-03/shoes.png'), // 鞋子照片
+                    "mask": [{
+                        "plate": 1,
+                        "url": require('../assets/images/shoes-03/mask-01.png'),
+                        "points": [
+                            { x: -92, y: 123 },
+                            { x: 892, y: 92 },
+                            { x: 863, y: 977 },
+                            { x: 26, y: 862 },
                         ]
                     }]
                 },
@@ -122,18 +135,26 @@ export default {
         renderShose(shoes) {
             // Get transformImages
             const maskedImages = Promise.mapSeries(shoes.mask, mask => {
-                return this.getTransformImage(
-                    this.plates[mask.plate].url,
-                    mask.url,
-                    mask.points
-                );
+                if (this.plates[mask.plate].url) { // 编辑过的面板
+                    return this.getTransformImage(
+                        this.plates[mask.plate].url,
+                        mask.url,
+                        mask.points
+                    );
+                } else { // 未编辑的面板
+                    return {
+                        promise: Promise.resolve(false),
+                    }
+                }
             });
 
             return this.getBaseCanvas(shoes.picture).then(context => {
                 return Promise.mapSeries(maskedImages, maskedImage => {
                     return maskedImage.promise;
                 }).mapSeries(ctx => {
-                    return context.drawImage(ctx.canvas, 0, 0);
+                    if (ctx) {
+                        return context.drawImage(ctx.canvas, 0, 0);
+                    }
                 }).then(() => {
                     return context;
                 });

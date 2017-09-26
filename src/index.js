@@ -2,8 +2,7 @@ import './style/index.scss';
 import Vue from 'vue';
 import fabricEditor from './fabric-editor.js';
 
-import plate from './assets/images/plate.png';
-import pattern from './assets/images/pattern.jpg';
+import pattern from './assets/images/pattern-01.jpg';
 
 window.onload = () => {
     const editor = new Vue({
@@ -36,12 +35,7 @@ window.onload = () => {
 
         mounted() {
             console.info('App mouted');
-            // debugger;
-            this.editor.setPlate(plate);
-            this.editor.addImage(pattern, {
-                width: 500,
-                height: 500
-            });
+            this.editor.currentPlate = 0;
         },
     });
 

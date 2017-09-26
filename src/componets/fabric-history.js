@@ -69,7 +69,6 @@ export default {
          * 历史记录发生变化发生事件
          */
         onSnapshot(item) {
-            this.plates[0].url = this.exportDataURL();
             this.$emit('snapshot', item, this.history);
         }
     },
