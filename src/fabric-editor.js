@@ -315,6 +315,15 @@ const fabricEditor = {
         this.$on('snapshot', () => {
             this.plates[this.currentPlate].url = this.exportDataURL();
         });
+
+        // 设置当前选中的元素
+        this.fabric.on("object:selected", (e) => {
+            this.currentElement = e.target;
+        });
+
+        this.fabric.on("selection:cleared", (e) => {
+            this.currentElement = null;
+        });
     }
 }
 Vue.component('fabric-editor', fabricEditor);
