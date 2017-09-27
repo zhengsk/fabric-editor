@@ -11,7 +11,7 @@ export default {
             if (this.history.current > 0) {
                 const snapshot = this.history.prev();
                 const data = JSON.parse(snapshot.data);
-                this.importTemplate(data).then(() => {
+                return this.importPlateString(data).then(() => {
                     // Set current element.
                     if (snapshot.currentElment !== null) {
                         const element = this.getElementFromIndex(snapshot.currentElment);
@@ -25,7 +25,7 @@ export default {
             if (this.history.current < this.history.queue.length - 1) {
                 const snapshot = this.history.next();
                 const data = JSON.parse(snapshot.data);
-                this.importTemplate(data).then(() => {
+                return this.importPlateString(data).then(() => {
                     // Set current element.
                     if (snapshot.currentElment !== null) {
                         const element = this.getElementFromIndex(snapshot.currentElment);
@@ -39,11 +39,10 @@ export default {
          * 添加快照
          */
         makeSnapshot(actionName) {
-            console.info(actionName);
             this.history.add({
                 action: actionName || 'no Named',
                 currentElment: this.getIndexFromElement(),
-                data: this.exportTemplateString(),
+                data: this.exportPlateString(),
             });
         },
         /**

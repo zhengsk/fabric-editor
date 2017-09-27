@@ -197,6 +197,19 @@ const fabricEditor = {
         },
 
         /**
+         * 获取元素的边界位置
+         *
+         * @param {Object} element
+         * @returns
+         */
+        getElementBounding(element) {
+            element = element || this.currentElement;
+            if (element) {
+                return element.getBoundingRect();
+            }
+        },
+
+        /**
          * 获取元素索引值
          * @param {Object} [element]
          * @returns {Number} - 索引值
@@ -247,11 +260,11 @@ const fabricEditor = {
         },
 
         /**
-         * 导入模板数据
+         * 导入面板模板数据
          * @param {JSON} data - 模板数据
          * @param {Function} reviver - Method for further parsing of JSON elements, called after each fabric object created.
          */
-        importTemplate(data, reviver) {
+        importPlate(data, reviver) {
             this.toggleSnapshot(false);
             return new Promise((resolve, reject) => {
                 this.fabric.loadFromJSON(data, resolve, reviver);
@@ -260,15 +273,66 @@ const fabricEditor = {
             });
         },
 
+        importPlateString(data, reviver) {
+            data = JSON.stringify(data);
+            return this.importPlate(data, reviver);
+        },
+
+        exportPlate() {
+            return this.fabric.toJSON();
+        },
+
+        exportPlateString() {
+            return JSON.stringify(this.exportPlate());
+        },
+
+        /**
+         * 导入模板数据
+         * @param {JSON} data - 模板数据
+         * @param {Function} reviver - Method for further parsing of JSON elements, called after each fabric object created.
+         */
+        importTemplate(data, plate = 0) {
+            this.toggleSnapshot(false);
+
+            if (typeof data === 'string') {
+                data = JSON.parse(data);
+            }
+
+            const plates = data.plates.map(plate => {
+                return Object.assign({}, plate, {
+                    template: JSON.parse(plate.template)
+                });
+            });
+
+            this.version = data.version;
+            this.plates = plates;
+            this.rendering = data.rendering;
+
+            if (plate !== false) {
+                this.currentPlate = plate;
+            }
+
+            this.toggleSnapshot(true);
+        },
+
         /**
          * exportTemplate 导出模板数据
          */
         exportTemplate() {
-            return this.fabric.toJSON();
-        },
+            // 保存当前template
+            this.plates[this.currentPlate].template = this.exportPlate();
 
-        exportTemplateString() {
-            return JSON.stringify(this.exportTemplate());
+            const plates = this.plates.map(plate => {
+                return Object.assign({}, plate, {
+                    template: JSON.stringify(plate.template)
+                });
+            });
+
+            return JSON.stringify({
+                version: this.version,
+                plates: plates,
+                rendering: this.rendering,
+            });
         },
     },
 
@@ -276,12 +340,12 @@ const fabricEditor = {
         currentPlate(val, oldVal) {
             // 保存模板数据
             if (oldVal !== null) {
-                this.plates[oldVal].template = this.exportTemplate();
+                this.plates[oldVal].template = this.exportPlate();
             }
 
             const plateDatas = this.plates[val];
             if (plateDatas.template) { // 使用模板
-                this.importTemplate(plateDatas.template);
+                this.importPlate(plateDatas.template);
             } else { // 初始编辑
                 this.clear();
                 this.setPlate(plateDatas.plate);
@@ -319,10 +383,24 @@ const fabricEditor = {
         // 设置当前选中的元素
         this.fabric.on("object:selected", (e) => {
             this.currentElement = e.target;
+            this.$emit('element-change', this.currentElement, 'selected');
         });
 
         this.fabric.on("selection:cleared", (e) => {
             this.currentElement = null;
+            this.$emit('element-change', this.currentElement, 'unselected');
+        });
+
+        this.fabric.on("object:rotating", (e) => {
+            this.$emit('element-change', this.currentElement, 'rotating');
+        });
+
+        this.fabric.on("object:scaling", (e) => {
+            this.$emit('element-change', this.currentElement, 'scaling');
+        });
+
+        this.fabric.on("object:moving", (e) => {
+            this.$emit('element-change', this.currentElement, 'moving');
         });
     }
 }
