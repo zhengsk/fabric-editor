@@ -2,8 +2,6 @@ import './style/index.scss';
 import Vue from 'vue';
 import fabricEditor from './fabric-editor.js';
 
-import pattern from './assets/images/pattern-01.jpg';
-
 window.onload = () => {
     const editor = new Vue({
         el: '#app',
@@ -60,7 +58,7 @@ window.onload = () => {
 
 
     window.addImage = () => {
-        window.editor.addImage(pattern, {
+        window.editor.addImage('http://qn-us.fenglinghudong.com/editor-images/pattern-01.jpg', {
             width: 500,
             height: 500
         });

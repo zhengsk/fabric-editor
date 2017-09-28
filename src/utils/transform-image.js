@@ -40,9 +40,11 @@ function transformImage(options) {
 
     // mask
     var mask = new Image();
+    mask.crossOrigin = "Anonymous";
 
     // image
     var img = new Image();
+    img.crossOrigin = "Anonymous";
     img.src = opts.imageSrc;
 
     img.onload = function() {

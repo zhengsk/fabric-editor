@@ -163,6 +163,29 @@ export default {
             return Promise.mapSeries(this.rendering, shoes => {
                 return this.renderShose(shoes);
             });
+        },
+
+        /**
+         * 获取渲染图片
+         */
+        getRenderImage(shoeses = true, plates = true) {
+            let shoesImges = [];
+            if (shoeses) {
+                shoesImges = this.renderAllShose().mapSeries(ctx => {
+                    return ctx.canvas.toDataURL('image/png');
+                })
+            }
+
+            let plateimages = [];
+            if (plates) {
+                plateimages = Promise.mapSeries(this.plates, plate => {
+                    return plate.url;
+                })
+            }
+
+            return Promise.join(shoesImges, plateimages, (shoeses, plates) => {
+                return shoeses.concat(plates);
+            });
         }
     },
 
