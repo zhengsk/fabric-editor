@@ -179,7 +179,7 @@ export default {
             let plateimages = [];
             if (plates) {
                 plateimages = Promise.mapSeries(this.plates, plate => {
-                    return plate.url;
+                    return plate.url || plate.plate;
                 })
             }
 
