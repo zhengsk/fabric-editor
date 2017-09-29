@@ -86,7 +86,7 @@ export default {
                 hasDot: false, // 显示点
                 hasRect: false, // 显示方格
                 hasPic: true, // 显示图片
-                count: 10, // 等分割数量,
+                count: 5, // 等分割数量,
                 isMask: true, // 是否应用蒙版
             });
         },
