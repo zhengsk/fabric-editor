@@ -90,6 +90,7 @@ const fabricEditor = {
             element = this.getElement();
             if (element) {
                 this.fabric.bringForward(element);
+                this.makeSnapshot('forwardElement');
             }
             return element;
         },
@@ -102,6 +103,7 @@ const fabricEditor = {
             element = this.getElement();
             if (element) {
                 this.fabric.bringToFront(element);
+                this.makeSnapshot('frontElment');
             }
             return element;
         },
@@ -114,6 +116,7 @@ const fabricEditor = {
             element = this.getElement();
             if (element) {
                 this.fabric.sendBackwards(element);
+                this.makeSnapshot('backwardElement');
             }
             return element;
         },
@@ -126,6 +129,7 @@ const fabricEditor = {
             element = this.getElement();
             if (element) {
                 this.fabric.sendToBack(element);
+                this.makeSnapshot('backElement');
             }
             return element;
         },
