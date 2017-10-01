@@ -106,7 +106,7 @@ const fabricEditor = {
          * @param {Object} element
          */
         forwardElement(element) {
-            element = this.getElement();
+            element = this.getElement(element);
             if (element) {
                 this.fabric.bringForward(element);
                 this.makeSnapshot('forwardElement');
@@ -119,7 +119,7 @@ const fabricEditor = {
          * @param {Object} element
          */
         frontElment(element) {
-            element = this.getElement();
+            element = this.getElement(element);
             if (element) {
                 this.fabric.bringToFront(element);
                 this.makeSnapshot('frontElment');
@@ -132,7 +132,7 @@ const fabricEditor = {
          * @param {Object} element
          */
         backwardElement(element) {
-            element = this.getElement();
+            element = this.getElement(element);
             if (element) {
                 this.fabric.sendBackwards(element);
                 this.makeSnapshot('backwardElement');
@@ -145,7 +145,7 @@ const fabricEditor = {
          * @param {Object} element
          */
         backElement(element) {
-            element = this.getElement();
+            element = this.getElement(element);
             if (element) {
                 this.fabric.sendToBack(element);
                 this.makeSnapshot('backElement');
@@ -211,7 +211,7 @@ const fabricEditor = {
          * @param {Object} [element] - 要删除的元素
          */
         deleteElement(element) {
-            element = this.getElement();
+            element = this.getElement(element);
             if (element) {
                 this.fabric.remove(element);
                 this.makeSnapshot('Remove element');
@@ -228,7 +228,13 @@ const fabricEditor = {
         getElementBounding(element) {
             element = element || this.currentElement;
             if (element) {
-                return element.getBoundingRect();
+                element.setCoords();
+                const bounding = element.getBoundingRect();
+                bounding.centerX = bounding.left + bounding.width / 2;
+                bounding.centerY = bounding.top + bounding.height / 2;
+                return bounding;
+            } else {
+                return false;
             }
         },
 

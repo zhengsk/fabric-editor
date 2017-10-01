@@ -8,71 +8,72 @@ const ImageStore = {};
 
 export default {
     name: 'fabric-render',
+    /*
+    data: function() {
+        return {
+            "version": 1,
+            "plates": [{
+                "plate": 'http://qn-us.fenglinghudong.com/editor-images/plate-01.png', // 鞋面原图
+                "template": null, // editor image
+                "url": null, // 定制后的鞋面图片
+            }, {
+                "plate": 'http://qn-us.fenglinghudong.com/editor-images/plate-02.png', // 鞋面原图
+                "template": null, // editor image
+                "url": null, // 定制后的鞋面图片
+            }],
 
-    // data: function() {
-    //     return {
-    //         "version": 1,
-    //         "plates": [{
-    //             "plate": 'http://qn-us.fenglinghudong.com/editor-images/plate-01.png', // 鞋面原图
-    //             "template": null, // editor image
-    //             "url": null, // 定制后的鞋面图片
-    //         }, {
-    //             "plate": 'http://qn-us.fenglinghudong.com/editor-images/plate-02.png', // 鞋面原图
-    //             "template": null, // editor image
-    //             "url": null, // 定制后的鞋面图片
-    //         }],
-
-    //         "rendering": [{
-    //                 "picture": 'http://qn-us.fenglinghudong.com/editor-images/shoes-04/shoes.png', // 鞋子照片
-    //                 "mask": [{
-    //                     "plate": 0,
-    //                     "url": 'http://qn-us.fenglinghudong.com/editor-images/shoes-04/mask-01.png',
-    //                     "points": [
-    //                         { x: 272, y: 111 },
-    //                         { x: 940, y: -28 },
-    //                         { x: 963, y: 703 },
-    //                         { x: 306, y: 1114 },
-    //                     ]
-    //                 }, {
-    //                     "plate": 1,
-    //                     "url": 'http://qn-us.fenglinghudong.com/editor-images/shoes-04/mask-07.png',
-    //                     "points": [
-    //                         { x: 272, y: 111 },
-    //                         { x: 940, y: -28 },
-    //                         { x: 963, y: 703 },
-    //                         { x: 306, y: 1114 },
-    //                     ]
-    //                 }]
-    //             },
-    //             {
-    //                 "picture": 'http://qn-us.fenglinghudong.com/editor-images/shoes-02/shoes.png', // 鞋子照片
-    //                 "mask": [{
-    //                     "plate": 0,
-    //                     "url": 'http://qn-us.fenglinghudong.com/editor-images/shoes-02/mask-01.png',
-    //                     "points": [
-    //                         { x: 131, y: -33 },
-    //                         { x: 1064, y: 104 },
-    //                         { x: 987, y: 902 },
-    //                         { x: 66, y: 1057 },
-    //                     ]
-    //                 }]
-    //             },
-    //             {
-    //                 "picture": 'http://qn-us.fenglinghudong.com/editor-images/shoes-03/shoes.png', // 鞋子照片
-    //                 "mask": [{
-    //                     "plate": 1,
-    //                     "url": 'http://qn-us.fenglinghudong.com/editor-images/shoes-03/mask-01.png',
-    //                     "points": [
-    //                         { x: -92, y: 123 },
-    //                         { x: 892, y: 92 },
-    //                         { x: 863, y: 977 },
-    //                         { x: 26, y: 862 },
-    //                     ]
-    //                 }]
-    //             },
-    //         ],
-    //     };
-    // },
+            "rendering": [{
+                    "picture": 'http://qn-us.fenglinghudong.com/editor-images/shoes-04/shoes.png', // 鞋子照片
+                    "mask": [{
+                        "plate": 0,
+                        "url": 'http://qn-us.fenglinghudong.com/editor-images/shoes-04/mask-01.png',
+                        "points": [
+                            { x: 272, y: 111 },
+                            { x: 940, y: -28 },
+                            { x: 963, y: 703 },
+                            { x: 306, y: 1114 },
+                        ]
+                    }, {
+                        "plate": 1,
+                        "url": 'http://qn-us.fenglinghudong.com/editor-images/shoes-04/mask-07.png',
+                        "points": [
+                            { x: 272, y: 111 },
+                            { x: 940, y: -28 },
+                            { x: 963, y: 703 },
+                            { x: 306, y: 1114 },
+                        ]
+                    }]
+                },
+                {
+                    "picture": 'http://qn-us.fenglinghudong.com/editor-images/shoes-02/shoes.png', // 鞋子照片
+                    "mask": [{
+                        "plate": 0,
+                        "url": 'http://qn-us.fenglinghudong.com/editor-images/shoes-02/mask-01.png',
+                        "points": [
+                            { x: 131, y: -33 },
+                            { x: 1064, y: 104 },
+                            { x: 987, y: 902 },
+                            { x: 66, y: 1057 },
+                        ]
+                    }]
+                },
+                {
+                    "picture": 'http://qn-us.fenglinghudong.com/editor-images/shoes-03/shoes.png', // 鞋子照片
+                    "mask": [{
+                        "plate": 1,
+                        "url": 'http://qn-us.fenglinghudong.com/editor-images/shoes-03/mask-01.png',
+                        "points": [
+                            { x: -92, y: 123 },
+                            { x: 892, y: 92 },
+                            { x: 863, y: 977 },
+                            { x: 26, y: 862 },
+                        ]
+                    }]
+                },
+            ],
+        };
+    },
+    */
 
     methods: {
         // 获取变形后的图片

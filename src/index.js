@@ -31,7 +31,10 @@ window.onload = () => {
             },
 
             onElementSelectChange(element, action) {
-                console.info(element, action, element && this.editor.getElementBounding());
+                // console.info(element, action, element && this.editor.getElementBounding());
+                // this.editor.getElementBounding()
+                // console.info(this.editor.getElementBounding().top);
+                // console.info(element.getBoundingRect());
             }
         },
 
