@@ -5,12 +5,13 @@ import Vue from 'vue';
 import fabricHistory from './componets/fabric-history.js';
 import fabricImage from './componets/fabric-image.js';
 import fabricText from './componets/fabric-text.js';
+import fabricRender from './componets/fabric-render.js';
 
 
 const fabricEditor = {
     name: 'fabric-editor',
     template: '<canvas></canvas>',
-    mixins: [fabricImage, fabricText, fabricHistory],
+    mixins: [fabricImage, fabricText, fabricHistory, fabricRender],
     props: {
         width: Number,
         height: Number,
@@ -19,6 +20,7 @@ const fabricEditor = {
     data: () => {
         return {
             currentElement: null, // 当前选中元素
+            currentPlate: null, // 当前编辑面板索引
         };
     },
 
@@ -44,7 +46,8 @@ const fabricEditor = {
             return this.fabric.canvas.getContext('2d');
         },
 
-        getImageFromeURL(url, options) {
+        getImageFromeURL(url, options = {}) {
+            options.crossOrigin = 'Anonymous';
             return new Promise((resolve, reject) => {
                 fabric.Image.fromURL(url, resolve, options);
             });
@@ -56,13 +59,32 @@ const fabricEditor = {
          * @param {Object} options - fabric image 参数
          */
         setPlate(imgSrc, options) {
+            this.clear();
             return this.getImageFromeURL(imgSrc, options).then(image => {
                 this.context.globalCompositeOperation = "source-out";
                 this.fabric.setBackgroundImage(image);
                 this.renderAll();
 
-                this.history.add('setPlate');
                 return image;
+            });
+        },
+
+        /**
+         * 切换不同的鞋面编辑
+         * @param {Number} index - 鞋面索引值
+         */
+        switchPlate(index) {
+            const plateDatas = this.plates[index];
+            this.$emit('plateChange'); // Set hisotry instance.
+
+            Promise.try(() => {
+                if (plateDatas.template) { // 使用模板
+                    return this.importPlate(plateDatas.template);
+                } else { // 初始编辑
+                    return this.setPlate(plateDatas.plate);
+                }
+            }).then(() => {
+                this.makeSnapshot('switchPlate', true);
             });
         },
 
@@ -87,6 +109,7 @@ const fabricEditor = {
             element = this.getElement();
             if (element) {
                 this.fabric.bringForward(element);
+                this.makeSnapshot('forwardElement');
             }
             return element;
         },
@@ -99,6 +122,7 @@ const fabricEditor = {
             element = this.getElement();
             if (element) {
                 this.fabric.bringToFront(element);
+                this.makeSnapshot('frontElment');
             }
             return element;
         },
@@ -111,6 +135,7 @@ const fabricEditor = {
             element = this.getElement();
             if (element) {
                 this.fabric.sendBackwards(element);
+                this.makeSnapshot('backwardElement');
             }
             return element;
         },
@@ -123,6 +148,7 @@ const fabricEditor = {
             element = this.getElement();
             if (element) {
                 this.fabric.sendToBack(element);
+                this.makeSnapshot('backElement');
             }
             return element;
         },
@@ -181,6 +207,32 @@ const fabricEditor = {
         },
 
         /**
+         * 删除元素
+         * @param {Object} [element] - 要删除的元素
+         */
+        deleteElement(element) {
+            element = this.getElement();
+            if (element) {
+                this.fabric.remove(element);
+                this.makeSnapshot('Remove element');
+                return element;
+            }
+        },
+
+        /**
+         * 获取元素的边界位置
+         *
+         * @param {Object} element
+         * @returns
+         */
+        getElementBounding(element) {
+            element = element || this.currentElement;
+            if (element) {
+                return element.getBoundingRect();
+            }
+        },
+
+        /**
          * 获取元素索引值
          * @param {Object} [element]
          * @returns {Number} - 索引值
@@ -207,6 +259,12 @@ const fabricEditor = {
             return this.fabric.item(index);
         },
 
+        /**
+         * 清除画布
+         */
+        clear() {
+            this.fabric.clear();
+        },
 
         /**
          * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
@@ -225,11 +283,11 @@ const fabricEditor = {
         },
 
         /**
-         * 导入模板数据
+         * 导入面板模板数据
          * @param {JSON} data - 模板数据
          * @param {Function} reviver - Method for further parsing of JSON elements, called after each fabric object created.
          */
-        importTemplate(data, reviver) {
+        importPlate(data, reviver) {
             this.toggleSnapshot(false);
             return new Promise((resolve, reject) => {
                 this.fabric.loadFromJSON(data, resolve, reviver);
@@ -238,16 +296,86 @@ const fabricEditor = {
             });
         },
 
+        importPlateString(data, reviver) {
+            data = JSON.stringify(data);
+            return this.importPlate(data, reviver);
+        },
+
+        exportPlate() {
+            return this.fabric.toJSON();
+        },
+
+        exportPlateString() {
+            return JSON.stringify(this.exportPlate());
+        },
+
+        /**
+         * 导入模板数据
+         * @param {JSON} data - 模板数据
+         * @param {Number} plate - 初始画布索引
+         */
+        importTemplate(data, plate = 0) {
+            this.clearHistory();
+
+            this.toggleSnapshot(false);
+
+            if (typeof data === 'string') {
+                data = JSON.parse(data);
+            }
+
+            const plates = data.plates.map(plate => {
+                return Object.assign({}, plate, {
+                    template: JSON.parse(plate.template)
+                });
+            });
+
+            this.version = data.version;
+            this.plates = plates;
+            this.rendering = data.rendering;
+
+            if (plate !== false) {
+                if (this.currentPlate === plate) {
+                    this.switchPlate(plate);
+                } else {
+                    this.currentPlate = plate;
+                }
+            } else {
+                this.clear();
+            }
+
+            this.toggleSnapshot(true);
+        },
+
         /**
          * exportTemplate 导出模板数据
          */
         exportTemplate() {
-            return this.fabric.toJSON();
-        },
+            // 保存当前template
+            this.plates[this.currentPlate].template = this.exportPlate();
 
-        exportTemplateString() {
-            return JSON.stringify(this.exportTemplate());
+            const plates = this.plates.map(plate => {
+                return Object.assign({}, plate, {
+                    template: JSON.stringify(plate.template)
+                });
+            });
+
+            return JSON.stringify({
+                version: this.version,
+                plates: plates,
+                rendering: this.rendering,
+            });
         },
+    },
+
+    watch: {
+        currentPlate(val, oldVal) {
+            // 保存模板数据
+            if (oldVal !== null) {
+                this.plates[oldVal].template = this.exportPlate();
+            }
+
+            this.switchPlate(val);
+        }
     },
 
     mounted() {
@@ -273,6 +401,32 @@ const fabricEditor = {
             cornerStyle: 'circle',
         });
 
+        this.$on('snapshot', () => {
+            this.plates[this.currentPlate].url = this.exportDataURL();
+        });
+
+        // 设置当前选中的元素
+        this.fabric.on("object:selected", (e) => {
+            this.currentElement = e.target;
+            this.$emit('element-change', this.currentElement, 'selected');
+        });
+
+        this.fabric.on("selection:cleared", (e) => {
+            this.currentElement = null;
+            this.$emit('element-change', this.currentElement, 'unselected');
+        });
+
+        this.fabric.on("object:rotating", (e) => {
+            this.$emit('element-change', this.currentElement, 'rotating');
+        });
+
+        this.fabric.on("object:scaling", (e) => {
+            this.$emit('element-change', this.currentElement, 'scaling');
+        });
+
+        this.fabric.on("object:moving", (e) => {
+            this.$emit('element-change', this.currentElement, 'moving');
+        });
     }
 }
 Vue.component('fabric-editor', fabricEditor);

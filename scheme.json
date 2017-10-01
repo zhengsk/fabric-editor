@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "plates": [{
+        "plate": "plate url", // 鞋面图片
+        "template": "{json data}", // editor image
+        "url": "resultImageUrl"
+    }],
+
+    "rendering": [{
+        "picture": "picture url", // 鞋子照片
+        "mask": [{
+            "plate": 3,
+            "url": "mask url",
+            "points": [
+                { "x": 33, "y": 44 },
+                { "x": 500, "y": 94 },
+                { "x": 33, "y": 800 },
+                { "x": 799, "y": 600 }
+            ]
+        }]
+    }]
+}

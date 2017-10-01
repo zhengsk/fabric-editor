@@ -34,7 +34,6 @@ const fabricText = {
 
                 element.setCoords();
                 this.renderAll();
-
                 this.makeSnapshot('Modify Text:', prop);
             }
         },
