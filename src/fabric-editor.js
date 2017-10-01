@@ -390,7 +390,7 @@ const fabricEditor = {
     },
 
     watch: {
-        currentPlate(val, oldVal) {
+        currentPlate(val, oldVal) { // 编辑鞋面变化
             // 保存模板数据
             if (oldVal !== null) {
                 this.plates[oldVal].template = this.exportPlate();
