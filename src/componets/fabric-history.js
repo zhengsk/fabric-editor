@@ -1,5 +1,7 @@
 import HistoryFactory from './history-factory';
 
+let HistoryInstance = [];
+
 export default {
     props: {
         historyChange: {
@@ -38,12 +40,14 @@ export default {
         /**
          * 添加快照
          */
-        makeSnapshot(actionName) {
-            this.history.add({
-                action: actionName || 'no Named',
-                currentElment: this.getIndexFromElement(),
-                data: this.exportPlateString(),
-            });
+        makeSnapshot(actionName, ifEmpty = false) {
+            if (ifEmpty !== true || this.history.queue.length === 0) {
+                this.history.add({
+                    action: actionName || 'no Named',
+                    currentElment: this.getIndexFromElement(),
+                    data: this.exportPlateString(),
+                });
+            }
         },
         /**
          *  历史快照功能开关
@@ -65,6 +69,13 @@ export default {
         },
 
         /**
+         * 清楚所有历史记录实例
+         */
+        clearHistory() {
+            HistoryInstance = [];
+        },
+
+        /**
          * 历史记录发生变化发生事件
          */
         onSnapshot(item) {
@@ -78,6 +89,23 @@ export default {
             maxLength: 80,
             throttle: 600,
             onChange: self.onSnapshot,
+        });
+
+        /**
+         * On plate change switch history instance.
+         */
+        this.$on('plateChange', (index) => {
+            index = index || this.currentPlate;
+
+            if (!HistoryInstance[index]) { // If not exist;
+                HistoryInstance[index] = new HistoryFactory({
+                    maxLength: 80,
+                    throttle: 600,
+                    onChange: self.onSnapshot,
+                });
+            }
+
+            this.history = HistoryInstance[index];
         });
 
         this.$nextTick(() => {

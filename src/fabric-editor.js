@@ -59,13 +59,32 @@ const fabricEditor = {
          * @param {Object} options - fabric image 参数
          */
         setPlate(imgSrc, options) {
+            this.clear();
             return this.getImageFromeURL(imgSrc, options).then(image => {
                 this.context.globalCompositeOperation = "source-out";
                 this.fabric.setBackgroundImage(image);
                 this.renderAll();
 
-                this.history.add('setPlate');
                 return image;
+            });
+        },
+
+        /**
+         * 切换不同的鞋面编辑
+         * @param {Number} index - 鞋面索引值
+         */
+        switchPlate(index) {
+            const plateDatas = this.plates[index];
+            this.$emit('plateChange'); // Set hisotry instance.
+
+            Promise.try(() => {
+                if (plateDatas.template) { // 使用模板
+                    return this.importPlate(plateDatas.template);
+                } else { // 初始编辑
+                    return this.setPlate(plateDatas.plate);
+                }
+            }).then(() => {
+                this.makeSnapshot('switchPlate', true);
             });
         },
 
@@ -293,9 +312,11 @@ const fabricEditor = {
         /**
          * 导入模板数据
          * @param {JSON} data - 模板数据
-         * @param {Function} reviver - Method for further parsing of JSON elements, called after each fabric object created.
+         * @param {Number} plate - 初始画布索引
          */
         importTemplate(data, plate = 0) {
+            this.clearHistory();
+
             this.toggleSnapshot(false);
 
             if (typeof data === 'string') {
@@ -313,7 +334,13 @@ const fabricEditor = {
             this.rendering = data.rendering;
 
             if (plate !== false) {
-                this.currentPlate = plate;
+                if (this.currentPlate === plate) {
+                    this.switchPlate(plate);
+                } else {
+                    this.currentPlate = plate;
+                }
+            } else {
+                this.clear();
             }
 
             this.toggleSnapshot(true);
@@ -347,13 +374,7 @@ const fabricEditor = {
                 this.plates[oldVal].template = this.exportPlate();
             }
 
-            const plateDatas = this.plates[val];
-            if (plateDatas.template) { // 使用模板
-                this.importPlate(plateDatas.template);
-            } else { // 初始编辑
-                this.clear();
-                this.setPlate(plateDatas.plate);
-            }
+            this.switchPlate(val);
         }
     },
 
