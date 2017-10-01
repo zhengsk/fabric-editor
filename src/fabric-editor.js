@@ -102,6 +102,22 @@ const fabricEditor = {
         },
 
         /**
+         * 设置元素(相对或绝对)角度
+         * @param {Number} angle - 角度
+         * @param {Boolean} relative - 是否相对角度
+         */
+        setElementAngle(angle, relative = false, element) {
+            const ele = element || this.getCurrentElement();
+            if (ele) {
+                angle = relative ? (ele.angle + angle) : angle;
+                ele.rotate(angle);
+                ele.setCoords();
+                this.renderAll();
+                this.makeSnapshot('set Angle');
+            }
+        },
+
+        /**
          * 向前一步层级
          * @param {Object} element
          */
