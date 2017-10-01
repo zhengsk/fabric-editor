@@ -13,12 +13,14 @@ export default {
             if (this.history.current > 0) {
                 const snapshot = this.history.prev();
                 const data = JSON.parse(snapshot.data);
-                return this.importPlateString(data).then(() => {
+                return this.importPlate(data).then(() => {
                     // Set current element.
                     if (snapshot.currentElment !== null) {
                         const element = this.getElementFromIndex(snapshot.currentElment);
                         this.setCurrentElement(element);
                     }
+
+                    this.onSnapshot(data, 'undo');
                 });
             }
         },
@@ -27,12 +29,14 @@ export default {
             if (this.history.current < this.history.queue.length - 1) {
                 const snapshot = this.history.next();
                 const data = JSON.parse(snapshot.data);
-                return this.importPlateString(data).then(() => {
+                return this.importPlate(data).then(() => {
                     // Set current element.
                     if (snapshot.currentElment !== null) {
                         const element = this.getElementFromIndex(snapshot.currentElment);
                         this.setCurrentElement(element);
                     }
+
+                    this.onSnapshot(data, 'redo');
                 });
             }
         },
@@ -78,8 +82,8 @@ export default {
         /**
          * 历史记录发生变化发生事件
          */
-        onSnapshot(item) {
-            this.$emit('snapshot', item, this.history);
+        onSnapshot(item, action) {
+            this.$emit('snapshot', item, this.history, action);
         }
     },
 
