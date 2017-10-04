@@ -84,6 +84,7 @@ const fabricEditor = {
                     return this.setPlate(plateDatas.plate);
                 }
             }).then(() => {
+                // SwitchPlate only make effect when history is empty.
                 this.makeSnapshot('switchPlate', true);
             });
         },

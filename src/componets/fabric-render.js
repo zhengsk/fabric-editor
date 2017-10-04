@@ -124,13 +124,13 @@ export default {
         },
 
         /**
-         * 渲染一张鞋子图片
-         * @param {Object} rendering - 数据
-         * @returns canvas.context 渲染完成图片上下文
+         * 获取蒙版后的图片
+         * @param {Object} shoes
+         * @returns {Object} - 包含变形蒙版后的对象
          */
-        renderShose(shoes) {
+        getMaskedImage(shoes) {
             // Get transformImages
-            const maskedImages = Promise.mapSeries(shoes.mask, mask => {
+            return Promise.mapSeries(shoes.mask, mask => {
                 if (this.plates[mask.plate].url) { // 编辑过的面板
                     return this.getTransformImage(
                         this.plates[mask.plate].url,
@@ -143,6 +143,16 @@ export default {
                     }
                 }
             });
+        },
+
+        /**
+         * 渲染一张鞋子图片
+         * @param {Object} rendering - 数据
+         * @returns canvas.context 渲染完成图片上下文
+         */
+        renderShose(shoes) {
+            // Get transformImages
+            const maskedImages = this.getMaskedImage(shoes);
 
             return this.getBaseCanvas(shoes.picture).then(context => {
                 return Promise.mapSeries(maskedImages, maskedImage => {
@@ -156,6 +166,16 @@ export default {
                 });
             });
         },
+        /**
+         * 渲染所有图片
+         * @returns [Array Promise] - canvas context.
+         */
+        renderAllShose() {
+            return Promise.mapSeries(this.rendering, shoes => {
+                return this.renderShose(shoes);
+            });
+        },
+
         /**
          * 渲染所有图片
          * @returns [Array Promise] - canvas context.
