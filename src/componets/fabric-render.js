@@ -166,6 +166,7 @@ export default {
                 });
             });
         },
+
         /**
          * 渲染所有图片
          * @returns [Array Promise] - canvas context.
@@ -177,13 +178,47 @@ export default {
         },
 
         /**
-         * 渲染所有图片
+         * 根据鞋面，渲染相关所有图片
+         * @param {Number} plateIndex - 渲染指定鞋面，相关的渲染图
+         * @param {boolean} [allShoes=true] - 返回所有渲染图，包括未指定的鞋面
          * @returns [Array Promise] - canvas context.
          */
-        renderAllShose() {
-            return Promise.mapSeries(this.rendering, shoes => {
-                return this.renderShose(shoes);
-            });
+        renderByPlate(plateIndex, allShoes = true) {
+            plateIndex = plateIndex || this.currentPlate;
+
+            let shoesImges;
+            if (allShoes) { // Return all context.
+                const contexts = this.rendering.map(shoes => {
+                    const isRender = shoes.mask.some(mask => {
+                        return mask.plate === plateIndex;
+                    });
+                    if (isRender) {
+                        // Rerend canvas.
+                        return this.renderShose(shoes);
+                    } else {
+                        // Return no change canvas.
+                        const hash = CryptoJS.SHA1(shoes.picture).toString();
+                        if (!ContextStore[hash]) {
+                            return this.getBaseCanvas(shoes.picture);
+                        } else {
+                            return ContextStore[hash];
+                        }
+                    }
+                });
+                shoesImges = Promise.all(contexts);
+            } else { // Return only changed canvas.
+                const rendering = this.rendering.filter(shoes => {
+                    return shoes.mask.some(mask => {
+                        return mask.plate === plateIndex;
+                    });
+                });
+
+                shoesImges = Promise.mapSeries(rendering, shoes => {
+                    return this.renderShose(shoes);
+                });
+            }
+
+            return shoesImges;
         },
 
         /**
@@ -192,7 +227,7 @@ export default {
         getRenderImage(shoeses = true, plates = true) {
             let shoesImges = [];
             if (shoeses) {
-                shoesImges = this.renderAllShose().mapSeries(ctx => {
+                shoesImges = this.renderByPlate().mapSeries(ctx => {
                     return ctx.canvas.toDataURL('image/png');
                 })
             }

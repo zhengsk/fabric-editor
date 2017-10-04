@@ -22,12 +22,20 @@ window.onload = () => {
         methods: {
             onSnapShot(item) {
                 console.info(item);
-                this.editor.renderAllShose().each(context => {
+
+                this.editor.renderByPlate().each(context => {
                     if (!context.appended) {
                         document.body.appendChild(context.canvas);
                         context.appended = true;
                     }
-                });
+                })
+
+                // this.editor.renderAllShose().each(context => {
+                //     if (!context.appended) {
+                //         document.body.appendChild(context.canvas);
+                //         context.appended = true;
+                //     }
+                // });
             },
 
             onElementSelectChange(element, action) {
