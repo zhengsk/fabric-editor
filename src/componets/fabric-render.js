@@ -97,7 +97,6 @@ export default {
          */
         getBaseCanvas(picture) {
             const hash = CryptoJS.SHA1(picture).toString();
-
             if (!ContextStore[hash]) {
                 ImageStore[hash] = loadImage(picture);
                 ContextStore[hash] = ImageStore[hash].then(img => {
@@ -121,6 +120,7 @@ export default {
                     });
                 });
             };
+
         },
 
         /**

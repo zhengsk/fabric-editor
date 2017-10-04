@@ -424,7 +424,11 @@ const fabricEditor = {
         });
 
         this.$on('snapshot', () => {
-            this.plates[this.currentPlate].url = this.exportDataURL();
+            if (this.fabric.size()) {
+                this.plates[this.currentPlate].url = this.exportDataURL();
+            } else {
+                this.plates[this.currentPlate].url = null;
+            }
         });
 
         // 设置当前选中的元素
