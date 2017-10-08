@@ -58,9 +58,27 @@ const fabricEditor = {
          * @param {String} imgSrc - 图片地址
          * @param {Object} options - fabric image 参数
          */
-        setPlate(imgSrc, options) {
+        setPlate(imgSrc, options = {}) {
             this.clear();
             return this.getImageFromeURL(imgSrc, options).then(image => {
+
+                if (options.plateColor) {
+                    const elem = image._element;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = elem.width;
+                    canvas.height = elem.height;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.drawImage(elem, 0, 0, elem.width, elem.height);
+                    ctx.globalCompositeOperation = "source-in";
+
+                    ctx.rect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = options.plateColor;
+                    ctx.fill();
+
+                    image = new fabric.Image(canvas);
+                }
+
                 this.context.globalCompositeOperation = "source-out";
                 this.fabric.setBackgroundImage(image);
                 this.renderAll();
