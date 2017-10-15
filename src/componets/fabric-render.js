@@ -15,12 +15,14 @@ export default {
             "plates": [{
                 "plate": 'http://qn-us.fenglinghudong.com/editor-images/plate-01.png', // 鞋面原图
                 "template": null, // editor image
-                "url": null, // 定制后的鞋面图片
+                "url": null, // 定制后的鞋面图片,
             }, {
                 "plate": 'http://qn-us.fenglinghudong.com/editor-images/plate-02.png', // 鞋面原图
                 "template": null, // editor image
-                "url": null, // 定制后的鞋面图片
+                "url": null, // 定制后的鞋面图片,
             }],
+
+            plateColor: '#FF0000',
 
             "rendering": [{
                     "picture": 'http://qn-us.fenglinghudong.com/editor-images/shoes-04/shoes.png', // 鞋子照片
@@ -120,7 +122,6 @@ export default {
                     });
                 });
             };
-
         },
 
         /**

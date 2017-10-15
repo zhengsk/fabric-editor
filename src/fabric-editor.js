@@ -2,11 +2,12 @@ import Promise from 'bluebird';
 import { fabric } from 'fabric';
 import Vue from 'vue';
 
+import './componets/fabric-plate-color.js';
+
 import fabricHistory from './componets/fabric-history.js';
 import fabricImage from './componets/fabric-image.js';
 import fabricText from './componets/fabric-text.js';
 import fabricRender from './componets/fabric-render.js';
-
 
 const fabricEditor = {
     name: 'fabric-editor',
@@ -21,6 +22,7 @@ const fabricEditor = {
         return {
             currentElement: null, // 当前选中元素
             currentPlate: null, // 当前编辑面板索引
+            plateColor: null, // 鞋面底色
         };
     },
 
@@ -61,30 +63,56 @@ const fabricEditor = {
         setPlate(imgSrc, options = {}) {
             this.clear();
             return this.getImageFromeURL(imgSrc, options).then(image => {
-
-                if (options.plateColor) {
-                    const elem = image._element;
-                    const canvas = document.createElement('canvas');
-                    canvas.width = elem.width;
-                    canvas.height = elem.height;
-                    const ctx = canvas.getContext('2d');
-
-                    ctx.drawImage(elem, 0, 0, elem.width, elem.height);
-                    ctx.globalCompositeOperation = "source-in";
-
-                    ctx.rect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = options.plateColor;
-                    ctx.fill();
-
-                    image = new fabric.Image(canvas);
-                }
-
                 this.context.globalCompositeOperation = "source-out";
                 this.fabric.setBackgroundImage(image);
-                this.renderAll();
 
+                if (options.plateColor) {
+                    this.setPlateColor(options.plateColor);
+                }
+
+                this.renderAll();
                 return image;
             });
+        },
+
+        addPlateElement(color) {
+            color = color !== undefined ? color : this.plateColor;
+            const plateColor = new fabric.PlateColor({
+                globalCompositeOperation: 'source-atop',
+                selectable: false,
+                evented: false,
+                top: 0,
+                left: 0, 
+                width: 1000, 
+                height: 1000, 
+                fill: color,
+            });
+            
+            this.fabric.insertAt(plateColor, 0);
+        },
+
+        /**
+         * 设置鞋面底色
+         * @param {String} color - 颜色
+         * @param {Object} plateIndex - 鞋面
+         */
+        setPlateColor(color) {
+            let element = this.getAllElements('plate-color');
+            if (color) {
+                if(element.length) {
+                    element[0].setColor(color);
+                } else {
+                    this.addPlateElement(color);
+                }
+            } else {
+                if(element.length) {
+                    this.deleteElement(element[0]);
+                }
+            }
+
+            this.plateColor = color;
+            this.renderAll();
+            this.makeSnapshot('plateColor change');
         },
 
         /**
@@ -99,7 +127,7 @@ const fabricEditor = {
                 if (plateDatas.template) { // 使用模板
                     return this.importPlate(plateDatas.template);
                 } else { // 初始编辑
-                    return this.setPlate(plateDatas.plate);
+                    return this.setPlate(plateDatas.plate, {plateColor: this.plateColor});
                 }
             }).then(() => {
                 // SwitchPlate only make effect when history is empty.
@@ -332,6 +360,10 @@ const fabricEditor = {
             this.toggleSnapshot(false);
             return new Promise((resolve, reject) => {
                 this.fabric.loadFromJSON(data, resolve, reviver);
+
+                if(!this.plateColor && (!data[0] || !data[0].type === "plate-color")) {
+                    this.fabric.add
+                }
             }).finally(() => {
                 this.toggleSnapshot(true);
             });
@@ -371,6 +403,7 @@ const fabricEditor = {
             });
 
             this.version = data.version;
+            this.plateColor = data.plateColor;
             this.plates = plates;
             this.rendering = data.rendering;
 
@@ -416,6 +449,10 @@ const fabricEditor = {
             }
 
             this.switchPlate(val);
+        },
+
+        plateColor(color) { // 鞋面底色
+            this.setPlateColor(color);
         }
     },
 
