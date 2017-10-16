@@ -66,6 +66,10 @@ window.onload = () => {
         console.info(JSON.stringify(window.editor.exportDataURL()));
     }
 
+    window.plateGo = step => {
+        const index = window.editor.currentPlate;
+        window.editor.currentPlate = (index + step + window.editor.plates.length) % window.editor.plates.length;
+    }
 
 
     window.addImage = () => {
