@@ -292,6 +292,11 @@ const fabricEditor = {
             }
         },
 
+        setZoom(val) {
+            const center = this.fabric.getCenter();
+            this.fabric.zoomToPoint(new fabric.Point(center.left, center.top), val);
+        },
+
         /**
          * 获取元素的边界位置
          *
