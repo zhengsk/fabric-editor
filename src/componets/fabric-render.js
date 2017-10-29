@@ -241,7 +241,10 @@ export default {
             }
 
             return Promise.join(shoesImges, plateimages, (shoeses, plates) => {
-                return shoeses.concat(plates);
+                return {
+                    shoeses,
+                    plates
+                };
             });
         }
     },
