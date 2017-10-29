@@ -34,7 +34,7 @@ const fabricEditor = {
 
     methods: {
 
-        getPlate() {
+        setPlateData() {
             if (typeof this.currentPlate === 'number') {
                 this.plate = this.plates[this.currentPlate];
             } else {
@@ -404,21 +404,22 @@ const fabricEditor = {
          */
         importTemplate(data, plate = 0) {
             this.clearHistory();
-
             this.toggleSnapshot(false);
+            this.clear();
+            this.currentPlate = null;
 
             if (typeof data === 'string') {
                 data = JSON.parse(data);
             }
 
+            this.version = data.version;
+            
             const plates = data.plates.map(plate => {
                 return Object.assign({}, plate, {
                     template: JSON.parse(plate.template)
                 });
             });
 
-            this.version = data.version;
-            
             const self = this;
             plates.forEach(plate => { // two-way-binding for plateColor.
                 let plateColor = plate.plateColor;
@@ -437,22 +438,21 @@ const fabricEditor = {
                 });
             });
 
-            this.plates = plates;
-            this.rendering = data.rendering;
+            this.$nextTick(() => {
+                this.plates = plates;
+                this.rendering = data.rendering;
 
-            if (plate !== false) {
-                if (this.currentPlate === plate) {
-                    this.switchPlate(plate);
-                } else {
-                    this.currentPlate = plate;
+                if (plate !== false) {
+                    if (this.currentPlate === plate) {
+                        this.switchPlate(plate);
+                    } else {
+                        this.currentPlate = plate;
+                    }
                 }
-            } else {
-                this.clear();
-            }
 
-            this.clearContextStore();
-
-            this.toggleSnapshot(true);
+                this.clearContextStore();
+                this.toggleSnapshot(true);
+            });
         },
 
         /**
@@ -483,12 +483,14 @@ const fabricEditor = {
                 this.plates[oldVal].template = this.exportPlate();
             }
 
-            this.switchPlate(val);
+            if (val !== null) {
+                this.switchPlate(val);
+            }
 
-            this.getPlate();
+            this.setPlateData();
         },
 
-        plates: 'getPlate',
+        plates: 'setPlateData',
     },
 
     mounted() {
