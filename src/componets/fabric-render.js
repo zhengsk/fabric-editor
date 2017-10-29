@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js';
 import loadImage from '../utils/loadImage';
 import transformImage from '../utils/transform-image';
 
-const ContextStore = {};
+let ContextStore = {};
 const ImageStore = {};
 
 export default {
@@ -246,6 +246,11 @@ export default {
                     plates
                 };
             });
+        },
+
+        /** 清除画布缓存 */
+        clearContextStore() {
+            ContextStore = {};
         }
     },
 

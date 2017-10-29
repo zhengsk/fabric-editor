@@ -22,6 +22,7 @@ const fabricEditor = {
         return {
             currentElement: null, // 当前选中元素
             currentPlate: null, // 当前编辑面板索引
+            plate: null, // 当前编辑面板对象
         };
     },
 
@@ -29,17 +30,17 @@ const fabricEditor = {
         canvas() {
             return this.$el;
         },
-
-        plate() {
-            if (typeof this.currentPlate === 'number') {
-                return this.plates[this.currentPlate];
-            } else {
-                return false;
-            }
-        }
     },
 
     methods: {
+
+        getPlate() {
+            if (typeof this.currentPlate === 'number') {
+                this.plate = this.plates[this.currentPlate];
+            } else {
+                this.plate = false;
+            }
+        },
 
         /**
          * renderAll 重新渲染画布 fabric.renderAll 方法
@@ -135,7 +136,7 @@ const fabricEditor = {
                     return this.importPlate(plateDatas.template);
                 } else { // 初始编辑
                     return this.setPlate(plateDatas.plate, {
-                        plateColor: this.plate.plateColor
+                        plateColor: plateDatas.plateColor
                     });
                 }
             }).then(() => {
@@ -444,6 +445,8 @@ const fabricEditor = {
                 this.clear();
             }
 
+            this.clearContextStore();
+
             this.toggleSnapshot(true);
         },
 
@@ -476,7 +479,11 @@ const fabricEditor = {
             }
 
             this.switchPlate(val);
+
+            this.getPlate();
         },
+
+        plates: 'getPlate',
     },
 
     mounted() {
