@@ -46,14 +46,15 @@ export default {
         setPlate(imgSrc, options = {}) {
             // this.clear();
             return this.getImageFromeURL(imgSrc, options).then(image => {
-                this.fabric.canvas.getContext('2d').globalCompositeOperation = "source-out";
-                // this.fabric.setBackgroundImage(image);
+                // this.fabric.canvas.getContext('2d').globalCompositeOperation = "source-out";
+                this.fabric.setBackgroundImage(image);
 
                 if (options.plateColor) {
                     this.setPlateColor(options.plateColor);
                 }
 
-                this.renderAll();
+                // this.renderAll();
+                this.fabric.renderAll();
                 return image;
             });
         },

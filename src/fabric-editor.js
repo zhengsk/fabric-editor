@@ -94,12 +94,12 @@ const fabricEditor = {
             return this.fabric.canvas.getContext('2d');
         },
 
-        // getImageFromeURL(url, options = {}) {
-        //     options.crossOrigin = 'Anonymous';
-        //     return new Promise((resolve, reject) => {
-        //         fabric.Image.fromURL(url, resolve, options);
-        //     });
-        // },
+        getImageFromeURL(url, options = {}) {
+            options.crossOrigin = 'Anonymous';
+            return new Promise((resolve, reject) => {
+                fabric.Image.fromURL(url, resolve, options);
+            });
+        },
 
         /**
          * setPlate 添加底图
