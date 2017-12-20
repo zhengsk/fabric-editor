@@ -110,21 +110,28 @@ export default {
             }
 
             this.history = HistoryInstance[index];
+
+            this.$nextTick(() => {
+                const fabric = this.fabric;
+
+                if (!fabric.initForSnapshot) {
+                    fabric.on("object:added", (e) => {
+                        if (this.history.enable) {
+                            this.makeSnapshot('add');
+                        }
+                    });
+
+                    fabric.on("object:modified", (e) => {
+                        if (this.history.enable) {
+                            this.makeSnapshot('modify');
+                        }
+                    });
+
+                    fabric.initForSnapshot = true;
+                }
+            });
         });
 
-        this.$nextTick(() => {
-            const fabric = this.fabric;
-            fabric.on("object:added", (e) => {
-                if (this.history.enable) {
-                    this.makeSnapshot('add');
-                }
-            });
 
-            fabric.on("object:modified", (e) => {
-                if (this.history.enable) {
-                    this.makeSnapshot('modify');
-                }
-            });
-        })
     }
 }

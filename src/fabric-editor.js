@@ -4,8 +4,9 @@ import Vue from 'vue';
 
 import './components/fabric-plate-color';
 
-import fabricFactory from './components/fabric-factory';
-// import fabricHistory from './components/fabric-history';
+// import fabricFactory from './components/fabric-factory';
+import fabricHistory from './components/fabric-history';
+
 import fabricImage from './components/fabric-image';
 import fabricText from './components/fabric-text';
 import fabricRender from './components/fabric-render';
@@ -16,9 +17,8 @@ const fabricEditor = {
     name: 'fabric-editor',
     template: `
         <div>
-            <canvas v-if="!plates.length"></canvas>
             <fabric-canvas
-                v-else
+                v-if="plates.length"
                 v-for="(plate, index) in plates"
                 v-show="index === currentPlate"
                 ref="fabric"
@@ -28,7 +28,7 @@ const fabricEditor = {
             ></fabric-canvas>
         </div>
     `,
-    mixins: [fabricImage, fabricText, fabricRender],
+    mixins: [fabricHistory, fabricImage, fabricText, fabricRender],
     props: {
         width: Number,
         height: Number,
@@ -54,7 +54,7 @@ const fabricEditor = {
 
         // 当前fabric实例
         fabric() {
-            return this.$refs.fabric[this.currentPlate].fabric;
+            return this.$refs.fabric && this.$refs.fabric[this.currentPlate].fabric;
         },
 
         // 面板实例参数
@@ -179,7 +179,7 @@ const fabricEditor = {
                 }
             }).then(() => {
                 // SwitchPlate only make effect when history is empty.
-                // this.makeSnapshot('switchPlate', true);
+                this.makeSnapshot('switchPlate', true);
             });
         },
 
@@ -479,7 +479,7 @@ const fabricEditor = {
             this.$nextTick(() => {
                 this.plates = plates;
                 this.rendering = data.rendering;
-                debugger;
+
                 if (plate !== false) {
                     if (this.currentPlate === plate) {
                         this.switchPlate(plate);
@@ -522,7 +522,7 @@ const fabricEditor = {
             }
 
             if (val !== null) {
-                // this.switchPlate(val);
+                this.switchPlate(val);
             }
 
             this.setPlateData();
