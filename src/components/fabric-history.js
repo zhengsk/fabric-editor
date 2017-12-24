@@ -44,15 +44,16 @@ export default {
         /**
          * 添加快照
          */
-        makeSnapshot(actionName, ifEmpty = false) {
-            if (ifEmpty !== true || this.history.queue.length === 0) {
+        makeSnapshot(action) {
+            if (this.history.queue.length === 0) {
                 this.history.add({
-                    action: actionName || 'no Named',
+                    action: action || 'no Named',
                     currentElment: this.getIndexFromElement(),
                     data: this.exportPlateString(),
                 });
             }
         },
+
         /**
          *  历史快照功能开关
          */
@@ -110,28 +111,6 @@ export default {
             }
 
             this.history = HistoryInstance[index];
-
-            this.$nextTick(() => {
-                const fabric = this.fabric;
-
-                if (!fabric.initForSnapshot) {
-                    fabric.on("object:added", (e) => {
-                        if (this.history.enable) {
-                            this.makeSnapshot('add');
-                        }
-                    });
-
-                    fabric.on("object:modified", (e) => {
-                        if (this.history.enable) {
-                            this.makeSnapshot('modify');
-                        }
-                    });
-
-                    fabric.initForSnapshot = true;
-                }
-            });
         });
-
-
     }
 }

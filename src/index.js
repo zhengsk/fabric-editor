@@ -79,6 +79,10 @@ window.onload = () => {
         });
     }
 
+    window.changePlateColor = () => {
+        window.editor.setPlateColor('red');
+    };
+
     window.addText = () => {
         window.editor.addText();
     }

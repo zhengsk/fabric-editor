@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <div id="app">
+    <div id="app" style="margin-top: 840px;">
         <fabric-editor ref="editor" :width='1000' :height='1000' @snapshot='onSnapShot' @element-change='onElementSelectChange'></fabric-editor>
         <!-- <div v-if="editor.currentElement && editor.currentElement.type === 'text'">Tool Bar for text</div> -->
         <!-- <div v-if="editor.currentElement && editor.currentElement.type === 'image'">Tool Bar for Image</div> -->
@@ -33,6 +33,7 @@
         <br>
 
         <button onclick="addImage()">添加图片</button>
+        <button onclick="changePlateColor()">背景色</button>
         <br>
         <button onclick="editor.flipX()">水平翻转</button>
         <button onclick="editor.flipY()">垂直翻转</button>

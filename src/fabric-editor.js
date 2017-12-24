@@ -4,9 +4,6 @@ import Vue from 'vue';
 
 import './components/fabric-plate-color';
 
-// import fabricFactory from './components/fabric-factory';
-import fabricHistory from './components/fabric-history';
-
 import fabricImage from './components/fabric-image';
 import fabricText from './components/fabric-text';
 import fabricRender from './components/fabric-render';
@@ -20,7 +17,6 @@ const fabricEditor = {
             <fabric-canvas
                 v-if="plates.length"
                 v-for="(plate, index) in plates"
-                v-show="index === currentPlate"
                 ref="fabric"
                 :plate="plate"
                 :options="fabricOptions"
@@ -28,7 +24,7 @@ const fabricEditor = {
             ></fabric-canvas>
         </div>
     `,
-    mixins: [fabricHistory, fabricImage, fabricText, fabricRender],
+    mixins: [fabricImage, fabricText, fabricRender],
     props: {
         width: Number,
         height: Number,
@@ -38,6 +34,7 @@ const fabricEditor = {
         return {
             currentElement: null, // 当前选中元素
             currentPlate: null, // 当前编辑面板索引
+
             plate: 0, // 当前编辑面板对象
             plates: [], // 所有鞋面面板
         };
@@ -48,13 +45,19 @@ const fabricEditor = {
     },
 
     computed: {
-        canvas() {
-            return this.$el;
+        // 所有fabricCanvas实例
+        allFabricCanvas() {
+            return this.$refs.fabric || [];
+        },
+
+        // 当前画布元素
+        fabricCanvas() {
+            return this.allFabricCanvas[this.currentPlate] || {};
         },
 
         // 当前fabric实例
         fabric() {
-            return this.$refs.fabric && this.$refs.fabric[this.currentPlate].fabric;
+            return this.fabricCanvas.fabric;
         },
 
         // 面板实例参数
@@ -84,7 +87,7 @@ const fabricEditor = {
          * renderAll 重新渲染画布 fabric.renderAll 方法
          */
         renderAll() {
-            this.fabric.renderAll();
+            this.fabricCanvas.renderAll();
         },
 
         /**
@@ -107,34 +110,7 @@ const fabricEditor = {
          * @param {Object} options - fabric image 参数
          */
         setPlate(imgSrc, options = {}) {
-            this.clear();
-            return this.getImageFromeURL(imgSrc, options).then(image => {
-                this.context.globalCompositeOperation = "source-out";
-                // this.fabric.setBackgroundImage(image);
-
-                if (options.plateColor) {
-                    this.setPlateColor(options.plateColor);
-                }
-
-                this.renderAll();
-                return image;
-            });
-        },
-
-        addPlateElement(color) {
-            color = color !== undefined ? color : this.plateColor;
-            const plateColor = new fabric.PlateColor({
-                globalCompositeOperation: 'source-atop',
-                selectable: false,
-                evented: false,
-                top: 0,
-                left: 0,
-                width: 1000,
-                height: 1000,
-                fill: color,
-            });
-
-            this.fabric.insertAt(plateColor, 0);
+            this.fabricCanvas.setPlate(imgSrc, options);
         },
 
         /**
@@ -142,23 +118,17 @@ const fabricEditor = {
          * @param {String} color - 颜色
          * @param {Object} plateIndex - 鞋面
          */
-        setPlateColor(color) {
-            let element = this.getAllElements('plate-color');
-            if (color) {
-                if(element.length) {
-                    element[0].setColor(color);
-                } else {
-                    this.addPlateElement(color);
-                }
-            } else {
-                if(element.length) {
-                    this.deleteElement(element[0]);
-                }
+        setPlateColor(color, isAllCanvas = true) {
+            // fabricCanvas
+            let fabricCanvas = [this.fabricCanvas];
+            if (isAllCanvas) {
+                fabricCanvas = this.allFabricCanvas;
             }
 
-            this.plate.plateColor = color;
-            this.renderAll();
-            this.makeSnapshot('plateColor change');
+            // Set plate color element.
+            fabricCanvas.forEach(canvas => {
+                canvas.setColor(color);
+            });
         },
 
         /**
@@ -170,13 +140,13 @@ const fabricEditor = {
             this.$emit('plateChange'); // Set hisotry instance.
 
             Promise.try(() => {
-                if (plateDatas.template) { // 使用模板
-                    return this.importPlate(plateDatas.template);
-                } else { // 初始编辑
-                    return this.setPlate(plateDatas.plate, {
-                        plateColor: plateDatas.plateColor
-                    });
-                }
+                // if (plateDatas.template) { // 使用模板
+                //     return this.importPlate(plateDatas.template);
+                // } else { // 初始编辑
+                //     return this.setPlate(plateDatas.plate, {
+                //         plateColor: plateDatas.plateColor
+                //     });
+                // }
             }).then(() => {
                 // SwitchPlate only make effect when history is empty.
                 this.makeSnapshot('switchPlate', true);
@@ -280,15 +250,16 @@ const fabricEditor = {
          * @param {Boolean} [isAll = false] - 是否返回所有
          */
         getCurrentElement(isAll = false) {
-            return this.fabric[isAll ? 'getActiveObjects' : 'getActiveObject']();
+            return this.fabricCanvas.getCurrentElement(isAll);
         },
 
         /**
          * 返回所有[指定类型]元素
          * @param {*} [elementType] - 元素类型
          */
-        getAllElements(elementType) {
-            return this.fabric.getObjects(elementType);
+        getAllElements(elementType, fabricCanvas) {
+            fabricCanvas = fabricCanvas || this.fabricCanvas;
+            return fabricCanvas.getAllElements(elementType);
         },
 
         /**
@@ -296,7 +267,7 @@ const fabricEditor = {
          * @param {Object} [element]
          */
         getElement(element) {
-            return element || this.getCurrentElement();
+            return this.fabricCanvas.getElement(element);
         },
 
         /**
@@ -355,24 +326,6 @@ const fabricEditor = {
         },
 
         /**
-         * 获取元素索引值
-         * @param {Object} [element]
-         * @returns {Number} - 索引值
-         */
-        getIndexFromElement(element) {
-            element = this.getElement(element);
-            if (element) {
-                const elements = this.getAllElements();
-                for (let i = 0, j = elements.length; i < j; i++) {
-                    if (element === elements[i]) {
-                        return i;
-                    }
-                }
-            }
-            return null;
-        },
-
-        /**
          * 通过索引得到元素
          * @param {Number} index - 索引
          * @returns {Object} - element
@@ -380,6 +333,26 @@ const fabricEditor = {
         getElementFromIndex(index) {
             return this.fabric.item(index);
         },
+
+
+
+        /**
+         * 添加快照
+         * @param {*} action
+         */
+        makeSnapshot(action) {
+            this.fabricCanvas.makeSnapshot(action);
+        },
+
+
+        undo() {
+            this.fabricCanvas.undo();
+        },
+
+        redo() {
+            this.fabricCanvas.redo();
+        },
+
 
         /**
          * 清除画布
@@ -402,6 +375,11 @@ const fabricEditor = {
          */
         exportDataURL(options) {
             return this.fabric.toDataURL(options);
+        },
+
+        // 导出鞋面数据
+        exportPlate() {
+            return this.fabricCanvas.exportPlate();
         },
 
         /**
@@ -427,14 +405,6 @@ const fabricEditor = {
             return this.importPlate(data, reviver);
         },
 
-        exportPlate() {
-            return this.fabric.toJSON();
-        },
-
-        exportPlateString() {
-            return JSON.stringify(this.exportPlate());
-        },
-
         /**
          * 导入模板数据
          * @param {JSON} data - 模板数据
@@ -444,6 +414,7 @@ const fabricEditor = {
             // this.clearHistory();
             // this.toggleSnapshot(false);
             // this.clear();
+
             this.currentPlate = null;
 
             if (typeof data === 'string') {
@@ -458,23 +429,22 @@ const fabricEditor = {
                 });
             });
 
-            const self = this;
-            plates.forEach(plate => { // two-way-binding for plateColor.
-                let plateColor = plate.plateColor;
-                Object.defineProperty(plate, "plateColor", {
-                    get : function(){
-                        return plateColor;
-                    },
-                    set : function(newValue){
-                        if (plateColor !== newValue) {
-                            plateColor = newValue;
-                            self.setPlateColor(plateColor);
-                        };
-                    },
-                    enumerable : true,
-                    configurable : true
-                });
-            });
+            // const self = this;
+            // plates.forEach(plate => { // two-way-binding for plateColor.
+            //     let plateColor = plate.plateColor;
+            //     Object.defineProperty(plate, "plateColor", {
+            //         get : function(){
+            //             return plateColor;
+            //         },
+            //         set : function(newValue){
+            //             if (plateColor !== newValue) {
+            //                 self.setPlateColor(newValue);
+            //             };
+            //         },
+            //         enumerable : true,
+            //         configurable : true
+            //     });
+            // });
 
             this.$nextTick(() => {
                 this.plates = plates;
@@ -517,12 +487,14 @@ const fabricEditor = {
     watch: {
         currentPlate(val, oldVal) { // 编辑鞋面变化
             // 保存模板数据
-            if (oldVal !== null) {
+            if (oldVal !== null && val !== null) {
                 this.plates[oldVal].template = this.exportPlate();
             }
 
             if (val !== null) {
-                this.switchPlate(val);
+                this.$nextTick(() => {
+                    this.switchPlate(val);
+                });
             }
 
             this.setPlateData();
