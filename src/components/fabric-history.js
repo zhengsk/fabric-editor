@@ -45,13 +45,13 @@ export default {
          * 添加快照
          */
         makeSnapshot(action) {
-            if (this.history.queue.length === 0) {
-                this.history.add({
-                    action: action || 'no Named',
-                    currentElment: this.getIndexFromElement(),
-                    data: this.exportPlateString(),
-                });
-            }
+            // if (this.history.queue.length === 0) {
+            //     this.history.add({
+            //         action: action || 'no Named',
+            //         currentElment: this.getIndexFromElement(),
+            //         data: this.exportPlateString(),
+            //     });
+            // }
         },
 
         /**

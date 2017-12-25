@@ -23,23 +23,23 @@ window.onload = () => {
             onSnapShot(item) {
                 console.info(item);
 
-                this.editor.renderByPlate().each(context => {
-                    if (!context.appended) {
-                        document.body.appendChild(context.canvas);
-                        context.appended = true;
-                    }
-                })
-
-                // this.editor.renderAllShose().each(context => {
+                // this.editor.renderByPlate().each(context => {
                 //     if (!context.appended) {
                 //         document.body.appendChild(context.canvas);
                 //         context.appended = true;
                 //     }
                 // });
+
+                this.editor.renderAllShose().each(context => {
+                    if (!context.appended) {
+                        document.body.appendChild(context.canvas);
+                        context.appended = true;
+                    }
+                });
             },
 
             onElementSelectChange(element, action) {
-                // console.info(element, action, element && this.editor.getElementBounding());
+                console.info(element, action, element && this.editor.getElementBounding());
                 // this.editor.getElementBounding()
                 // console.info(this.editor.getElementBounding().top);
                 // console.info(element.getBoundingRect());

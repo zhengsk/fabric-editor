@@ -22,7 +22,8 @@ const fabricImage = {
                     this.setActiveElement(image);
                 }
 
-                this.makeSnapshot('addImage');
+                // this.makeSnapshot('addImage');
+                this.fireChange('AddImage');
                 return image;
             });
         },
@@ -42,7 +43,8 @@ const fabricImage = {
 
             element.setCoords();
             this.renderAll();
-            this.makeSnapshot('Modify Image flipX');
+            // this.makeSnapshot('Modify Image flipX');
+            this.fireChange('Modify Image flipX');
         },
 
         /**
@@ -60,7 +62,9 @@ const fabricImage = {
 
             element.setCoords();
             this.renderAll();
-            this.makeSnapshot('Modify Image flipY');
+
+            // this.makeSnapshot('Modify Image flipY');
+            this.fireChange('Modify Image flipY');
         },
     }
 }

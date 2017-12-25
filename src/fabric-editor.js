@@ -3,11 +3,7 @@ import { fabric } from 'fabric';
 import Vue from 'vue';
 
 import './components/fabric-plate-color';
-
-import fabricImage from './components/fabric-image';
-import fabricText from './components/fabric-text';
 import fabricRender from './components/fabric-render';
-
 import fabricCanvas from './components/fabric-canvas/fabric-canvas';
 
 const fabricEditor = {
@@ -17,6 +13,7 @@ const fabricEditor = {
             <fabric-canvas
                 v-if="plates.length"
                 v-for="(plate, index) in plates"
+                v-show="currentPlate === index"
                 ref="fabric"
                 :plate="plate"
                 :options="fabricOptions"
@@ -24,7 +21,7 @@ const fabricEditor = {
             ></fabric-canvas>
         </div>
     `,
-    mixins: [fabricImage, fabricText, fabricRender],
+    mixins: [fabricRender],
     props: {
         width: Number,
         height: Number,
@@ -35,7 +32,6 @@ const fabricEditor = {
             currentElement: null, // 当前选中元素
             currentPlate: null, // 当前编辑面板索引
 
-            plate: 0, // 当前编辑面板对象
             plates: [], // 所有鞋面面板
         };
     },
@@ -48,6 +44,14 @@ const fabricEditor = {
         // 所有fabricCanvas实例
         allFabricCanvas() {
             return this.$refs.fabric || [];
+        },
+
+        // 当前编辑面板对象
+        plate() {
+            if (typeof this.currentPlate === 'number') {
+                return this.plates[this.currentPlate];
+            }
+            return null;
         },
 
         // 当前画布元素
@@ -74,15 +78,6 @@ const fabricEditor = {
     },
 
     methods: {
-
-        setPlateData() {
-            if (typeof this.currentPlate === 'number') {
-                this.plate = this.plates[this.currentPlate];
-            } else {
-                this.plate = false;
-            }
-        },
-
         /**
          * renderAll 重新渲染画布 fabric.renderAll 方法
          */
@@ -132,25 +127,38 @@ const fabricEditor = {
         },
 
         /**
-         * 切换不同的鞋面编辑
-         * @param {Number} index - 鞋面索引值
+         * 添加图片元素
          */
-        switchPlate(index) {
-            const plateDatas = this.plates[index];
-            this.$emit('plateChange'); // Set hisotry instance.
+        addImage(imgSrc, options = {}, select = true) {
+            this.fabricCanvas.addImage(imgSrc, options, select);
+        },
 
-            Promise.try(() => {
-                // if (plateDatas.template) { // 使用模板
-                //     return this.importPlate(plateDatas.template);
-                // } else { // 初始编辑
-                //     return this.setPlate(plateDatas.plate, {
-                //         plateColor: plateDatas.plateColor
-                //     });
-                // }
-            }).then(() => {
-                // SwitchPlate only make effect when history is empty.
-                this.makeSnapshot('switchPlate', true);
-            });
+        /**
+         * 添加文本元素
+         */
+        addText(text, options = {}, select = true) {
+            this.fabricCanvas.addText(text, options, select);
+        },
+
+        /**
+         * 修改文字大小
+         */
+        setTextSize(value, element) {
+            this.fabricCanvas.setTextSize(value, element);
+        },
+
+        /**
+         * 修改文字颜色
+         */
+        setTextColor(value, element) {
+            this.fabricCanvas.setTextColor(value, element);
+        },
+
+        /**
+         * 设置文本字体
+         */
+        setFontFamily(familyname, element) {
+            this.fabricCanvas.setFontFamily(familyname, element);
         },
 
         /**
@@ -158,12 +166,7 @@ const fabricEditor = {
          * @param {*} element
          */
         setElementCenter(element) {
-            const ele = element || this.getCurrentElement();
-            if (ele) {
-                ele.center();
-                ele.setCoords();
-                this.makeSnapshot('set Element Center');
-            }
+            this.fabricCanvas.setElementCenter(element);
         },
 
         /**
@@ -275,9 +278,7 @@ const fabricEditor = {
          * @param {Object} element
          */
         setActiveElement(element) {
-            this.fabric.setActiveObject(element);
-            this.renderAll();
-            return element
+            return this.fabricCanvas.setActiveElement(element);
         },
 
         /**
@@ -286,6 +287,14 @@ const fabricEditor = {
          */
         deactiveElement(e) {
             this.fabric.discardActiveObject(e);
+        },
+
+        flipX(isFlip, element) {
+            return this.fabricCanvas.flipX(isFlip, element);
+        },
+
+        flipY(isFlip, element) {
+            return this.fabricCanvas.flipY(isFlip, element);
         },
 
         /**
@@ -313,16 +322,7 @@ const fabricEditor = {
          * @returns
          */
         getElementBounding(element) {
-            element = element || this.currentElement;
-            if (element) {
-                element.setCoords();
-                const bounding = element.getBoundingRect();
-                bounding.centerX = bounding.left + bounding.width / 2;
-                bounding.centerY = bounding.top + bounding.height / 2;
-                return bounding;
-            } else {
-                return false;
-            }
+            return this.fabricCanvas.getElementBounding(element);
         },
 
         /**
@@ -362,50 +362,6 @@ const fabricEditor = {
         },
 
         /**
-         * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
-         * @param {Object} [options] Options object
-         * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
-         * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
-         * @param {Number} [options.multiplier=1] Multiplier to scale by
-         * @param {Number} [options.left] Cropping left offset.
-         * @param {Number} [options.top] Cropping top offset.
-         * @param {Number} [options.width] Cropping width.
-         * @param {Number} [options.height] Cropping height.
-         * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
-         */
-        exportDataURL(options) {
-            return this.fabric.toDataURL(options);
-        },
-
-        // 导出鞋面数据
-        exportPlate() {
-            return this.fabricCanvas.exportPlate();
-        },
-
-        /**
-         * 导入面板模板数据
-         * @param {JSON} data - 模板数据
-         * @param {Function} reviver - Method for further parsing of JSON elements, called after each fabric object created.
-         */
-        importPlate(data, reviver) {
-            // this.toggleSnapshot(false);
-            return new Promise((resolve, reject) => {
-                this.fabric.loadFromJSON(data, resolve, reviver);
-
-                if(!this.plateColor && (!data[0] || !data[0].type === "plate-color")) {
-                    this.fabric.add
-                }
-            }).finally(() => {
-                // this.toggleSnapshot(true);
-            });
-        },
-
-        importPlateString(data, reviver) {
-            data = JSON.stringify(data);
-            return this.importPlate(data, reviver);
-        },
-
-        /**
          * 导入模板数据
          * @param {JSON} data - 模板数据
          * @param {Number} plate - 初始画布索引
@@ -429,36 +385,15 @@ const fabricEditor = {
                 });
             });
 
-            // const self = this;
-            // plates.forEach(plate => { // two-way-binding for plateColor.
-            //     let plateColor = plate.plateColor;
-            //     Object.defineProperty(plate, "plateColor", {
-            //         get : function(){
-            //             return plateColor;
-            //         },
-            //         set : function(newValue){
-            //             if (plateColor !== newValue) {
-            //                 self.setPlateColor(newValue);
-            //             };
-            //         },
-            //         enumerable : true,
-            //         configurable : true
-            //     });
-            // });
-
             this.$nextTick(() => {
                 this.plates = plates;
                 this.rendering = data.rendering;
 
                 if (plate !== false) {
-                    if (this.currentPlate === plate) {
-                        this.switchPlate(plate);
-                    } else {
-                        this.currentPlate = plate;
-                    }
+                    this.currentPlate = plate;
                 }
 
-                this.clearContextStore();
+                // this.clearContextStore();
                 // this.toggleSnapshot(true);
             });
         },
@@ -467,8 +402,10 @@ const fabricEditor = {
          * exportTemplate 导出模板数据
          */
         exportTemplate() {
-            // 保存当前template
-            this.plates[this.currentPlate].template = this.exportPlate();
+            // 保存template
+            this.allFabricCanvas.forEach(fabricCanvas => {
+                fabricCanvas.saveTemplate();
+            });
 
             const plates = this.plates.map(plate => {
                 return Object.assign({}, plate, {
@@ -486,30 +423,17 @@ const fabricEditor = {
 
     watch: {
         currentPlate(val, oldVal) { // 编辑鞋面变化
-            // 保存模板数据
-            if (oldVal !== null && val !== null) {
-                this.plates[oldVal].template = this.exportPlate();
-            }
 
-            if (val !== null) {
-                this.$nextTick(() => {
-                    this.switchPlate(val);
-                });
-            }
-
-            this.setPlateData();
-        },
-
-        plates: 'setPlateData',
+        }
     },
 
     mounted() {
         this.$on('snapshot', () => {
-            if (this.fabric.size()) {
-                this.plates[this.currentPlate].url = this.exportDataURL();
-            } else {
-                this.plates[this.currentPlate].url = null;
-            }
+            // if (this.fabric.size()) {
+            //     this.plates[this.currentPlate].url = this.exportDataURL();
+            // } else {
+            //     this.plates[this.currentPlate].url = null;
+            // }
         });
     }
 }

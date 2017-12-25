@@ -34,7 +34,8 @@ const fabricText = {
 
                 element.setCoords();
                 this.renderAll();
-                this.makeSnapshot('Modify Text:', prop);
+                // this.makeSnapshot('Modify Text:', prop);
+                this.fireChange('Modify Text:', prop);
             }
         },
 
@@ -60,8 +61,8 @@ const fabricText = {
          * 设置文本字体
          * @param {string} familyname
          */
-        setFontFamily(familyname) {
-
+        setFontFamily(familyname, element) {
+            this.changeText('fontFamily', familyname, element);
         },
     }
 };
