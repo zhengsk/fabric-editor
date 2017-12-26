@@ -130,7 +130,16 @@ const fabricEditor = {
          * 添加图片元素
          */
         addImage(imgSrc, options = {}, select = true) {
-            this.fabricCanvas.addImage(imgSrc, options, select);
+            return this.fabricCanvas.addImage(imgSrc, options, select);
+        },
+
+        /**
+         * 添加图片元素
+         */
+        addAllImage(imgSrc, options = {}, select = true) {
+            this.allFabricCanvas.forEach(fabricCanvas => {
+                return fabricCanvas.addImage(imgSrc, options, select);
+            });
         },
 
         /**

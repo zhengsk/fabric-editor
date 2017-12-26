@@ -73,7 +73,7 @@ window.onload = () => {
 
 
     window.addImage = () => {
-        window.editor.addImage('http://qn-us.fenglinghudong.com/editor-images/pattern-01.jpg', {
+        window.editor.addAllImage('http://qn-us.fenglinghudong.com/editor-images/pattern-01.jpg', {
             width: 500,
             height: 500
         });
