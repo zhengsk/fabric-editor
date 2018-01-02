@@ -69,7 +69,7 @@ export default {
                             { x: 892, y: 92 },
                             { x: 863, y: 977 },
                             { x: 26, y: 862 },
-                        ]
+                        ],
                     }]
                 },
             ],
@@ -79,12 +79,12 @@ export default {
 
     methods: {
         // 获取变形后的图片
-        getTransformImage(imageSrc, maskSrc, points) {
+        getTransformImage(imageSrc, maskSrc, points, extend = 2) {
             return transformImage({
                 imageSrc: imageSrc,
                 maskSrc: maskSrc,
                 points: points, // 默认位置
-                extend: 2, // 扩展三角形，处理缝隙问题
+                extend: extend, // 扩展三角形，处理缝隙问题
                 hasDrag: false, // 开启拖拽∏
                 hasDot: false, // 显示点
                 hasRect: false, // 显示方格
@@ -136,7 +136,8 @@ export default {
                     return this.getTransformImage(
                         this.plates[mask.plate].url,
                         mask.url,
-                        mask.points
+                        mask.points,
+                        mask.extend,
                     );
                 } else { // 未编辑的面板
                     return {
